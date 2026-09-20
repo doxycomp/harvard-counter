@@ -694,6 +694,24 @@ button.button--danger {
   font-variant-numeric: tabular-nums;
 }
 
+.preview-list {
+  margin: 0.5rem 0 0;
+  padding-inline-start: 1.1rem;
+}
+
+.preview-list__warn {
+  color: var(--danger);
+}
+
+input[type="file"] {
+  width: 100%;
+  padding: 0.5rem;
+  font: inherit;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
 .rank-list {
   margin: 0;
   padding: 0;

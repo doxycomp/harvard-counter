@@ -12,6 +12,7 @@ $items = [
     'counters' => ['counters.php', 'admin.nav.counters'],
     'stats' => ['stats.php', 'admin.nav.stats'],
     'collections' => ['collections.php', 'admin.nav.collections'],
+    'data' => ['data.php', 'admin.nav.data'],
     'account' => ['account.php', 'admin.nav.account'],
 ];
 ?>

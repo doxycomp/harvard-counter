@@ -50,6 +50,10 @@ return [
 
     'demo.notice' => 'Les compteurs ne sont conservés que pour cette session. Demandez un lien personnel sur Discord si vous souhaitez les enregistrer.',
 
+    'export.link' => 'Exporter mes données',
+    'export.denied.title' => 'Pas de lien d\'accès',
+    'export.denied.body' => 'L\'export nécessite un lien d\'accès personnel. Sans lui, il n\'y a rien à exporter : les compteurs de démonstration ne vivent que dans cette session.',
+
     'error.not_configured.title' => 'Configuration manquante',
     'error.not_configured.body' => 'Copiez config/config.example.php vers config/config.php et renseignez les identifiants de la base de données.',
     'error.db_unreachable.title' => 'Base de données injoignable',

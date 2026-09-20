@@ -10,11 +10,11 @@ supports further collections, including prose passages and other languages.
 
 ## Status
 
-Feature complete apart from export and import. Installation, coaches and
-students, access links, the sentence picker, counting with undo, the Discord
-template editor, the counter matrix and the statistics are all in place. See
-[docs/BUILDPLAN.md](docs/BUILDPLAN.md) for the full plan and the milestone
-list.
+Complete. Installation, coaches and students, access links, the sentence
+picker, counting with undo, the Discord template editor, the counter matrix,
+the statistics and the export/import round trip are all in place, in German,
+English and French. See [docs/BUILDPLAN.md](docs/BUILDPLAN.md) for the design
+and the reasoning behind it.
 
 ## Requirements
 
@@ -93,6 +93,27 @@ already?" answerable no matter who taught it. Rotate a link with
 `token:rotate` if it was shared by mistake; the old one stops working
 immediately.
 
+## Moving to your own server
+
+A coach can take their data with them. **Export my data** on the frontend, or
+**Data → Export** in the admin area, produces:
+
+- **JSON**, which the admin area can import again, and
+- **CSV**, one row per context and entry, for a spreadsheet.
+
+Counters are referenced by collection slug and entry number, never by internal
+id, so the file fits an instance where the ids came out differently. Access
+tokens are never exported — the new instance issues its own. The session
+history is left out unless you tick the box: the counters are what a move
+needs, and the timestamps of individual lessons should not travel by accident.
+
+Importing previews first, so you see "creates one coach and two students,
+applies 148 counters, skips 3" before anything is written. Counters that
+already hold a value are skipped rather than overwritten, because a student's
+counter is shared with their other coaches and blindly applying imported
+numbers would inflate figures that are already correct. There is a checkbox to
+overwrite anyway, for a genuinely fresh instance.
+
 ## Updating
 
 ```bash
@@ -125,11 +146,26 @@ used with credit to its authors.
 ```bash
 php -S 127.0.0.1:8000 -t public   # development server
 php bin/check_translations.php    # verify de/en/fr stay in sync
+php bin/check_contrast.php        # verify every theme meets WCAG AA
 ```
 
 UI strings live in `lang/<locale>/frontend.php` and `lang/<locale>/admin.php`.
 English is the reference locale; `check_translations.php` reports keys that are
 missing, orphaned, or used in code but defined nowhere.
+
+`check_contrast.php` computes the contrast ratio of every foreground/background
+pair in every theme and mode — five themes in two modes is more combinations
+than anyone can judge by eye, and a pastel palette is exactly where readable
+text quietly stops being readable.
+
+Two conventions worth knowing before changing anything:
+
+- **A GET never counts.** Only a POST increments a counter, and it answers with
+  a redirect. That is what makes reloading a result, switching context to look
+  something up, and opening an entry from the overview all harmless.
+- **A coach's total is derived**, summed at query time over their own row plus
+  their students. Nothing writes it, so nothing can put it out of step with the
+  rows it is made of.
 
 Everything in this repository — code, comments, documentation, commit
 messages — is written in English. German and French exist only as UI

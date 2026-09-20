@@ -114,4 +114,12 @@ $showContextPicker = !$visitor->isDemo() && count($visitor->selectable) > 0;
             <?php endforeach; ?>
         </p>
     <?php endif; ?>
+
+    <?php if (!$visitor->isDemo()): ?>
+        <p class="small muted picker-hint">
+            <a href="export.php<?= $carryToken === null ? '' : '?t=' . e($carryToken) ?>">
+                <?= e(t('export.link')) ?>
+            </a>
+        </p>
+    <?php endif; ?>
 </div>

@@ -466,9 +466,9 @@ Mobile-first, single column, no CSS framework.
 | M7 ✅ | Discord templates, presets, live preview |
 | M8 ✅ | Admin: login, coach/student CRUD, collections, counter matrix |
 | M9 ✅ | Statistics and "least used" |
-| M10 | Export (JSON/CSV) in frontend and admin, import in the admin area |
-| M11 | Responsive CSS, colour themes, clipboard UX, complete de/en/fr translations |
-| M12 | README: setup, deployment, configuration, adding collections, licence and attribution |
+| M10 ✅ | Export (JSON/CSV) in frontend and admin, import in the admin area |
+| M11 ✅ | Responsive CSS, colour themes, clipboard UX, complete de/en/fr translations |
+| M12 ✅ | README: setup, deployment, configuration, adding collections, licence and attribution |
 
 ---
 
