@@ -260,6 +260,188 @@ button.button--danger {
   background: var(--surface);
 }
 
+/* ---------------------------------------------------------------- picker */
+
+.picker-identity {
+  display: grid;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.picker-identity .field,
+.picker-number .field {
+  margin-bottom: 0;
+}
+
+.picker-number {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.field__hint--error {
+  color: var(--danger);
+}
+
+.picker-hint {
+  margin: 1rem 0 0;
+}
+
+.picker-hint a {
+  display: inline-block;
+  min-width: 1.75rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------- sentences */
+
+.result__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-top: 0;
+}
+
+.result__collection {
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.result__counts {
+  margin-bottom: 0.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sentences {
+  list-style: none;
+  counter-reset: sentence;
+  margin: 1rem 0;
+  padding: 0;
+}
+
+.sentences li {
+  counter-increment: sentence;
+  margin-bottom: 0.4rem;
+}
+
+/* Each sentence is one large tap target that copies itself. */
+.sentence {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0.55rem 0.75rem;
+  text-align: start;
+  font-weight: 400;
+  color: var(--fg);
+  background: var(--sunken);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+}
+
+.sentence::before {
+  content: counter(sentence) ".";
+  flex: none;
+  min-width: 1.4rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.sentence:hover {
+  border-color: var(--accent);
+}
+
+.sentence.is-copied {
+  border-color: var(--success);
+}
+
+.sentence__text {
+  flex: 1 1 auto;
+}
+
+.sentence__status {
+  flex: none;
+  font-size: 0.8rem;
+  color: var(--success);
+}
+
+.result__actions {
+  margin-top: 1rem;
+}
+
+.result__block {
+  margin-top: 1rem;
+}
+
+.result__block summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.discord-block {
+  margin: 0.75rem 0 0;
+  padding: 0.85rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* -------------------------------------------------------------- overview */
+
+.overview summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3.5rem, 1fr));
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+
+.item-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
+  padding: 0.3rem 0.2rem;
+  text-decoration: none;
+  color: var(--fg);
+  background: var(--sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-variant-numeric: tabular-nums;
+}
+
+.item-chip__no {
+  font-weight: 600;
+}
+
+.item-chip__uses {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.item-chip--unused {
+  border-style: dashed;
+  background: transparent;
+}
+
+.item-chip--current {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
 /* --------------------------------------------------------------- utility */
 
 .stack > * + * {
@@ -283,6 +465,19 @@ button.button--danger {
 
 /* ------------------------------------------------------------ responsive */
 
+@media (max-width: 39.999em) {
+  /* Keep "copy everything" reachable without scrolling back up a long list. */
+  .result__actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    padding: 0.6rem 0;
+    margin-bottom: -0.35rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+}
+
 @media (min-width: 40em) {
   .page {
     padding-inline: 1.5rem;
@@ -290,6 +485,16 @@ button.button--danger {
 
   h1 {
     font-size: 2rem;
+  }
+
+  .picker-identity {
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    align-items: end;
+  }
+
+  .picker-number {
+    grid-template-columns: minmax(8rem, 14rem) auto;
+    align-items: end;
   }
 }
 

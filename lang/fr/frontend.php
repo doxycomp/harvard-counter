@@ -22,11 +22,33 @@ return [
 
     'home.title' => 'Phrases d\'entraînement',
     'home.intro' => 'Demandez un numéro, obtenez les phrases correspondantes et voyez combien de fois elles ont déjà servi.',
-    'home.ready.collections.one' => '{count} collection est chargée.',
-    'home.ready.collections.other' => '{count} collections sont chargées.',
-    'home.ready.items.one' => '{count} entrée est disponible.',
-    'home.ready.items.other' => '{count} entrées sont disponibles.',
-    'home.ready.next' => 'Le sélecteur de phrases n\'est pas encore construit — cette page confirme que l\'installation fonctionne.',
+
+    'picker.collection' => 'Collection',
+    'picker.context' => 'Compter pour',
+    'picker.context.coach_total' => '{name} (total)',
+    'picker.number' => 'Numéro',
+    'picker.number.hint' => 'Un numéro au choix entre 1 et {max}.',
+    'picker.submit' => 'Afficher les phrases',
+    'picker.random' => 'Choisir au hasard',
+    'picker.error.number' => 'Veuillez saisir un numéro entre 1 et {max}.',
+    'picker.least_used' => 'Les moins utilisées ({count}×) :',
+
+    'result.uses.one' => 'Utilisée {count} fois',
+    'result.uses.other' => 'Utilisée {count} fois',
+    'result.uses_for' => 'Pour {name} : {count}×',
+    'result.total_for' => 'Total pour {name} : {count}×',
+    'result.shared_counter' => 'Ce compteur est partagé avec les autres coachs de cet élève.',
+    'result.copy_hint' => 'Cliquez sur une phrase pour la copier.',
+    'result.copied' => 'copié ✓',
+    'result.copy_all' => 'Tout copier pour Discord',
+    'result.dont_count' => 'Ne pas compter cet appel',
+    'result.not_counted' => 'Cet appel n\'a pas été compté.',
+    'result.show_block' => 'Afficher le bloc Discord',
+
+    'overview.title' => 'Les {count} entrées et leurs compteurs',
+    'overview.hint' => 'Ouvrir une entrée depuis ici ne la compte pas.',
+
+    'demo.notice' => 'Les compteurs ne sont conservés que pour cette session. Demandez un lien personnel sur Discord si vous souhaitez les enregistrer.',
 
     'error.not_configured.title' => 'Configuration manquante',
     'error.not_configured.body' => 'Copiez config/config.example.php vers config/config.php et renseignez les identifiants de la base de données.',

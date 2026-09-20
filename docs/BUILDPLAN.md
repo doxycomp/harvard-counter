@@ -460,9 +460,9 @@ Mobile-first, single column, no CSS framework.
 | M1 ✅ | Scaffolding: layout, `config.example.php`, PDO wrapper, migration runner, **i18n scaffolding**, theme scaffolding, `.gitignore` |
 | M2 ✅ | Collection schema + `data/collections/harvard-en/` (720 sentences, validated as 72 × 10) + idempotent importer |
 | M3 ✅ | Setup route with `setup_token`, self-locking |
-| M4 | Context graph (coaches/students, n:m), token resolution, demo mode |
-| M5 | Frontend: collection, dropdown, number entry, sentence output |
-| M6 | Counting with roll-up, undo, session counters in demo mode |
+| M4 ✅ | Context graph (coaches/students, n:m), token resolution, demo mode |
+| M5 ✅ | Frontend: collection, dropdown, number entry, sentence output |
+| M6 ✅ | Counting with roll-up, undo, session counters in demo mode |
 | M7 | Discord templates, presets, live preview |
 | M8 | Admin: login, coach/student CRUD, collections, counter matrix |
 | M9 | Statistics and "least used" |

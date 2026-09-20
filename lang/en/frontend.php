@@ -22,11 +22,33 @@ return [
 
     'home.title' => 'Practice sentences',
     'home.intro' => 'Ask for a number, get the matching sentences, and see how often they have been used.',
-    'home.ready.collections.one' => '{count} collection is loaded.',
-    'home.ready.collections.other' => '{count} collections are loaded.',
-    'home.ready.items.one' => '{count} item is available.',
-    'home.ready.items.other' => '{count} items are available.',
-    'home.ready.next' => 'The sentence picker is not built yet — this page confirms the installation works.',
+
+    'picker.collection' => 'Collection',
+    'picker.context' => 'Counting for',
+    'picker.context.coach_total' => '{name} (total)',
+    'picker.number' => 'Number',
+    'picker.number.hint' => 'Any number from 1 to {max}.',
+    'picker.submit' => 'Show sentences',
+    'picker.random' => 'Pick one at random',
+    'picker.error.number' => 'Please enter a number between 1 and {max}.',
+    'picker.least_used' => 'Least used ({count}×):',
+
+    'result.uses.one' => 'Used {count} time',
+    'result.uses.other' => 'Used {count} times',
+    'result.uses_for' => 'For {name}: {count}×',
+    'result.total_for' => 'Total for {name}: {count}×',
+    'result.shared_counter' => 'This counter is shared with the student\'s other coaches.',
+    'result.copy_hint' => 'Click a sentence to copy it.',
+    'result.copied' => 'copied ✓',
+    'result.copy_all' => 'Copy everything for Discord',
+    'result.dont_count' => 'Do not count this',
+    'result.not_counted' => 'That use was not counted.',
+    'result.show_block' => 'Show the Discord block',
+
+    'overview.title' => 'All {count} entries with their counters',
+    'overview.hint' => 'Opening an entry from here does not count it.',
+
+    'demo.notice' => 'Counters are only kept for this browser session. Ask in Discord for a personal link if you want them saved.',
 
     'error.not_configured.title' => 'Configuration missing',
     'error.not_configured.body' => 'Copy config/config.example.php to config/config.php and fill in the database credentials.',

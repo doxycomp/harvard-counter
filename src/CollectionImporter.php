@@ -215,31 +215,40 @@ final class CollectionImporter
             'sort_order' => (int) ($meta['sort_order'] ?? 0),
         ];
 
+        // Columns are derived from the keys rather than written out a second
+        // time, so the statement and its parameters cannot drift apart.
         if ($existing !== null) {
+            $assignments = implode(', ', array_map(
+                static fn (string $column): string => "{$column} = ?",
+                array_keys($values),
+            ));
+
             // is_active is deliberately not overwritten: whether a collection
             // is offered is an operator decision, not a property of the file.
+            // Anything outside 0/1 is repaired, though.
             Db::query(
-                'UPDATE collections SET content_lang = ?, names = ?, item_labels = ?,
-                    descriptions = ?, source_url = ?, attribution = ?, license_note = ?,
-                    item_count = ?, sort_order = ?, updated_at = NOW()
-                 WHERE id = ?',
+                "UPDATE collections SET {$assignments}, updated_at = NOW(),
+                    is_active = CASE WHEN is_active IN (0, 1) THEN is_active ELSE 1 END
+                 WHERE id = ?",
                 [...array_values($values), (int) $existing],
             );
 
             return (int) $existing;
         }
 
+        $row = [
+            'slug' => $meta['slug'],
+            'is_active' => ($meta['is_active'] ?? true) ? 1 : 0,
+            ...$values,
+        ];
+
+        $columns = implode(', ', array_keys($row));
+        $placeholders = implode(', ', array_fill(0, count($row), '?'));
+
         return Db::insert(
-            'INSERT INTO collections
-                (slug, content_lang, names, item_labels, descriptions, source_url,
-                 attribution, license_note, item_count, is_active, sort_order,
-                 created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
-            [
-                $meta['slug'],
-                ...array_values($values),
-                ($meta['is_active'] ?? true) ? 1 : 0,
-            ],
+            "INSERT INTO collections ({$columns}, created_at, updated_at)
+             VALUES ({$placeholders}, NOW(), NOW())",
+            array_values($row),
         );
     }
 

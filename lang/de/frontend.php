@@ -22,11 +22,33 @@ return [
 
     'home.title' => 'Übungssätze',
     'home.intro' => 'Nach einer Zahl fragen, die passenden Sätze erhalten und sehen, wie oft sie schon genutzt wurden.',
-    'home.ready.collections.one' => '{count} Sammlung ist geladen.',
-    'home.ready.collections.other' => '{count} Sammlungen sind geladen.',
-    'home.ready.items.one' => '{count} Eintrag ist verfügbar.',
-    'home.ready.items.other' => '{count} Einträge sind verfügbar.',
-    'home.ready.next' => 'Die Satzauswahl ist noch nicht gebaut — diese Seite bestätigt, dass die Installation funktioniert.',
+
+    'picker.collection' => 'Sammlung',
+    'picker.context' => 'Zählen für',
+    'picker.context.coach_total' => '{name} (gesamt)',
+    'picker.number' => 'Zahl',
+    'picker.number.hint' => 'Eine beliebige Zahl von 1 bis {max}.',
+    'picker.submit' => 'Sätze anzeigen',
+    'picker.random' => 'Zufällig auswählen',
+    'picker.error.number' => 'Bitte eine Zahl zwischen 1 und {max} eingeben.',
+    'picker.least_used' => 'Am seltensten genutzt ({count}×):',
+
+    'result.uses.one' => '{count}× genutzt',
+    'result.uses.other' => '{count}× genutzt',
+    'result.uses_for' => 'Für {name}: {count}×',
+    'result.total_for' => 'Gesamt bei {name}: {count}×',
+    'result.shared_counter' => 'Dieser Zähler wird mit den anderen Coaches dieses Schülers geteilt.',
+    'result.copy_hint' => 'Satz anklicken, um ihn zu kopieren.',
+    'result.copied' => 'kopiert ✓',
+    'result.copy_all' => 'Alles für Discord kopieren',
+    'result.dont_count' => 'Diesen Aufruf nicht zählen',
+    'result.not_counted' => 'Dieser Aufruf wurde nicht gezählt.',
+    'result.show_block' => 'Discord-Block anzeigen',
+
+    'overview.title' => 'Alle {count} Einträge mit Zählerstand',
+    'overview.hint' => 'Ein Eintrag, den du hier öffnest, wird nicht gezählt.',
+
+    'demo.notice' => 'Die Zähler gelten nur für diese Sitzung. Einen persönlichen Link zum Speichern gibt es im Discord.',
 
     'error.not_configured.title' => 'Konfiguration fehlt',
     'error.not_configured.body' => 'Kopiere config/config.example.php nach config/config.php und trage die Datenbank-Zugangsdaten ein.',

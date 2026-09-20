@@ -10,9 +10,10 @@ supports further collections, including prose passages and other languages.
 
 ## Status
 
-Under construction. The installation path is complete — schema, sentence
-import, setup page and administrator sign-in. The sentence picker, counters,
-Discord templates, statistics and export are still to come. See
+Under construction. The application is usable: installation, coaches and
+students, access links, the sentence picker, counting with undo, and the
+Discord block. The admin interface for managing all of it, the statistics and
+the export are still to come. See
 [docs/BUILDPLAN.md](docs/BUILDPLAN.md) for the full plan and the milestone
 list.
 
@@ -64,6 +65,30 @@ php bin/migrate.php              # apply pending migrations (--status to inspect
 php bin/import_collections.php   # import data/collections into the database
 php bin/create_admin.php <name>  # create an administrator or reset a password
 ```
+
+## Coaches, students and access links
+
+Until the admin area grows its own interface for this, coaches and students are
+managed from the command line:
+
+```bash
+php bin/contexts.php coach:add "Robin" --locale=de --theme=trans
+php bin/contexts.php student:add "Alex" --coach="Robin"
+php bin/contexts.php list
+```
+
+Creating a coach prints their access link (`/?t=…`). That link is the
+credential: anyone holding it counts against that coach's numbers, and anyone
+without it gets the demo mode, where counters start at zero and live only in
+the browser session.
+
+A student can belong to several coaches — `student:add` with an existing name
+links the existing record rather than creating a second person, and `--as` sets
+a display name for that one assignment. Their counter is then **shared**
+between those coaches, which is what makes "has this student had this list
+already?" answerable no matter who taught it. Rotate a link with
+`token:rotate` if it was shared by mistake; the old one stops working
+immediately.
 
 ## Updating
 
