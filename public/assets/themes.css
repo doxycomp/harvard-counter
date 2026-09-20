@@ -1,0 +1,239 @@
+/*
+ * Colour themes.
+ *
+ * Every theme defines a light palette (--l-*) and a dark palette (--d-*) in a
+ * single block. The mapping from those to the tokens the rest of the CSS uses
+ * is written once, at the bottom, so adding a theme never means touching the
+ * light/dark switching logic.
+ *
+ * Flag colours are used for accents, bands and focus rings only. Body text
+ * always sits on --bg or --surface with a contrast ratio of at least 4.5:1.
+ */
+
+/* ---------------------------------------------------------------- default */
+
+:root,
+:root[data-theme="default"] {
+  --l-bg: #fbfbfd;
+  --l-surface: #ffffff;
+  --l-sunken: #f2f2f7;
+  --l-fg: #16161d;
+  --l-muted: #5a5a6b;
+  --l-border: #e2e2ea;
+  --l-accent: #5b4bd6;
+  --l-accent-fg: #ffffff;
+  --l-accent-soft: #eeebfc;
+  --l-focus: #5b4bd6;
+  --l-danger: #b3261e;
+  --l-success: #1d6f42;
+  --l-band: linear-gradient(90deg, #5b4bd6, #8a7ef0);
+
+  --d-bg: #101017;
+  --d-surface: #1a1a24;
+  --d-sunken: #15151e;
+  --d-fg: #ececf2;
+  --d-muted: #a3a3b6;
+  --d-border: #2e2e3c;
+  --d-accent: #a99cff;
+  --d-accent-fg: #14121f;
+  --d-accent-soft: #262238;
+  --d-focus: #a99cff;
+  --d-danger: #ff9b91;
+  --d-success: #6fd39b;
+  --d-band: linear-gradient(90deg, #6f5fe0, #a99cff);
+}
+
+/* ------------------------------------------------------------------ pride */
+
+:root[data-theme="pride"] {
+  --l-bg: #fffdfb;
+  --l-surface: #ffffff;
+  --l-sunken: #f8f2f6;
+  --l-fg: #1a1418;
+  --l-muted: #5f5560;
+  --l-border: #ece2e9;
+  --l-accent: #8b1a9c;
+  --l-accent-fg: #ffffff;
+  --l-accent-soft: #fae9fd;
+  --l-focus: #8b1a9c;
+  --l-danger: #b3261e;
+  --l-success: #1d6f42;
+  --l-band: linear-gradient(90deg, #e40303, #ff8c00, #ffed00, #008026, #004dff, #750787);
+
+  --d-bg: #14101a;
+  --d-surface: #1e1826;
+  --d-sunken: #191320;
+  --d-fg: #f2ecf4;
+  --d-muted: #b5a9bd;
+  --d-border: #352c3e;
+  --d-accent: #ecafff;
+  --d-accent-fg: #1a1020;
+  --d-accent-soft: #2f2339;
+  --d-focus: #ecafff;
+  --d-danger: #ff9b91;
+  --d-success: #6fd39b;
+  --d-band: linear-gradient(90deg, #ff5a4d, #ffa640, #ffef6b, #3fc470, #5b8cff, #b07de0);
+}
+
+/* ----------------------------------------------------------------- pastel */
+
+:root[data-theme="pastel"] {
+  --l-bg: #fdf8fb;
+  --l-surface: #ffffff;
+  --l-sunken: #f6eef4;
+  --l-fg: #2b2430;
+  --l-muted: #6b6076;
+  --l-border: #f0e2ec;
+  --l-accent: #6d5bb5;
+  --l-accent-fg: #ffffff;
+  --l-accent-soft: #efe9fb;
+  --l-focus: #6d5bb5;
+  --l-danger: #a8443f;
+  --l-success: #3c7a58;
+  --l-band: linear-gradient(90deg, #ffd6e8, #e3dcff, #d9e8ff, #d6f5e3, #fff3cf);
+
+  --d-bg: #1b1720;
+  --d-surface: #252030;
+  --d-sunken: #201b28;
+  --d-fg: #f0eaf4;
+  --d-muted: #b6acc0;
+  --d-border: #383142;
+  --d-accent: #c9bcf7;
+  --d-accent-fg: #1e1830;
+  --d-accent-soft: #302940;
+  --d-focus: #c9bcf7;
+  --d-danger: #ffa9a2;
+  --d-success: #86d6aa;
+  --d-band: linear-gradient(90deg, #6d5570, #5c5680, #4f6480, #4c7a66, #7d7350);
+}
+
+/* ------------------------------------------------- mono (black and white) */
+
+:root[data-theme="mono"] {
+  --l-bg: #ffffff;
+  --l-surface: #ffffff;
+  --l-sunken: #f2f2f2;
+  --l-fg: #000000;
+  --l-muted: #454545;
+  --l-border: #bdbdbd;
+  --l-accent: #000000;
+  --l-accent-fg: #ffffff;
+  --l-accent-soft: #ebebeb;
+  --l-focus: #000000;
+  --l-danger: #000000;
+  --l-success: #000000;
+  --l-band: linear-gradient(90deg, #000000, #6b6b6b, #000000);
+
+  --d-bg: #000000;
+  --d-surface: #0e0e0e;
+  --d-sunken: #161616;
+  --d-fg: #ffffff;
+  --d-muted: #bcbcbc;
+  --d-border: #454545;
+  --d-accent: #ffffff;
+  --d-accent-fg: #000000;
+  --d-accent-soft: #1f1f1f;
+  --d-focus: #ffffff;
+  --d-danger: #ffffff;
+  --d-success: #ffffff;
+  --d-band: linear-gradient(90deg, #ffffff, #8a8a8a, #ffffff);
+}
+
+/* ------------------------------------------------------------------ trans */
+
+:root[data-theme="trans"] {
+  --l-bg: #fbfdff;
+  --l-surface: #ffffff;
+  --l-sunken: #eef6fb;
+  --l-fg: #14202b;
+  --l-muted: #536270;
+  --l-border: #dbe8f1;
+  --l-accent: #1a6f9e;
+  --l-accent-fg: #ffffff;
+  --l-accent-soft: #e3f4fd;
+  --l-focus: #1a6f9e;
+  --l-danger: #b3261e;
+  --l-success: #1d6f42;
+  --l-band: linear-gradient(90deg, #5bcefa, #f5a9b8, #ffffff, #f5a9b8, #5bcefa);
+
+  --d-bg: #0e161d;
+  --d-surface: #172330;
+  --d-sunken: #131d27;
+  --d-fg: #eaf4fb;
+  --d-muted: #a3b6c6;
+  --d-border: #27394b;
+  --d-accent: #5bcefa;
+  --d-accent-fg: #08131c;
+  --d-accent-soft: #1b2e3f;
+  --d-focus: #5bcefa;
+  --d-danger: #ff9b91;
+  --d-success: #6fd39b;
+  --d-band: linear-gradient(90deg, #5bcefa, #f5a9b8, #e8eef2, #f5a9b8, #5bcefa);
+}
+
+/* ----------------------------------------------------- light / dark wiring
+ *
+ * Written once for all themes. data-mode="system" (the default) follows the
+ * operating system; "light" and "dark" pin it. The server renders data-mode
+ * into <html>, so there is no flash of the wrong palette on load.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  --bg: var(--l-bg);
+  --surface: var(--l-surface);
+  --sunken: var(--l-sunken);
+  --fg: var(--l-fg);
+  --muted: var(--l-muted);
+  --border: var(--l-border);
+  --accent: var(--l-accent);
+  --accent-fg: var(--l-accent-fg);
+  --accent-soft: var(--l-accent-soft);
+  --focus: var(--l-focus);
+  --danger: var(--l-danger);
+  --success: var(--l-success);
+  --band: var(--l-band);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) {
+    color-scheme: dark;
+
+    --bg: var(--d-bg);
+    --surface: var(--d-surface);
+    --sunken: var(--d-sunken);
+    --fg: var(--d-fg);
+    --muted: var(--d-muted);
+    --border: var(--d-border);
+    --accent: var(--d-accent);
+    --accent-fg: var(--d-accent-fg);
+    --accent-soft: var(--d-accent-soft);
+    --focus: var(--d-focus);
+    --danger: var(--d-danger);
+    --success: var(--d-success);
+    --band: var(--d-band);
+  }
+}
+
+:root[data-mode="dark"] {
+  color-scheme: dark;
+
+  --bg: var(--d-bg);
+  --surface: var(--d-surface);
+  --sunken: var(--d-sunken);
+  --fg: var(--d-fg);
+  --muted: var(--d-muted);
+  --border: var(--d-border);
+  --accent: var(--d-accent);
+  --accent-fg: var(--d-accent-fg);
+  --accent-soft: var(--d-accent-soft);
+  --focus: var(--d-focus);
+  --danger: var(--d-danger);
+  --success: var(--d-success);
+  --band: var(--d-band);
+}
+
+:root[data-mode="light"] {
+  color-scheme: light;
+}

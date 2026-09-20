@@ -1,0 +1,10 @@
+# The repository is checked out directly on the web server, so line endings
+# must not depend on the machine a commit was made from.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
