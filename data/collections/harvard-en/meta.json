@@ -1,0 +1,29 @@
+{
+  "slug": "harvard-en",
+  "content_lang": "en",
+  "names": {
+    "en": "Harvard Sentences",
+    "de": "Harvard Sentences",
+    "fr": "Harvard Sentences"
+  },
+  "item_labels": {
+    "en": "List",
+    "de": "Liste",
+    "fr": "Liste"
+  },
+  "descriptions": {
+    "en": "72 lists of 10 phonetically balanced English sentences.",
+    "de": "72 Listen mit je 10 phonetisch ausgewogenen englischen Sätzen.",
+    "fr": "72 listes de 10 phrases anglaises phonétiquement équilibrées."
+  },
+  "source_url": "https://www.cs.columbia.edu/~hgs/audio/harvard.html",
+  "attribution": "Developed by Harvard University's Psycho-Acoustic Laboratory and published in the 1969 IEEE Recommended Practice for Speech Quality Measurements (IEEE Std 297-1969), Appendix C.",
+  "license_note": "Public domain.",
+  "sort_order": 10,
+  "is_active": true,
+  "items_file": "items.csv",
+  "expect": {
+    "items": 72,
+    "lines_per_item": 10
+  }
+}

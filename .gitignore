@@ -1,0 +1,12 @@
+# Local configuration holds database credentials and the setup token.
+/config/config.php
+
+# Runtime
+/var/
+*.log
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
