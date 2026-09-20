@@ -148,6 +148,103 @@ final class Contexts
         );
     }
 
+    /**
+     * Update a context row from a whitelist of columns, so a request can never
+     * reach a column it has no business touching (access_token above all).
+     */
+    public static function update(int $id, array $fields): void
+    {
+        $allowed = [
+            'name', 'sort_order', 'is_active', 'locale', 'theme', 'color_mode',
+            'default_collection_id', 'fmt_header', 'fmt_line', 'fmt_footer',
+            'fmt_codeblock', 'fmt_codeblock_lang',
+        ];
+
+        $set = array_intersect_key($fields, array_flip($allowed));
+        if ($set === []) {
+            return;
+        }
+
+        $assignments = implode(', ', array_map(
+            static fn (string $column): string => "{$column} = ?",
+            array_keys($set),
+        ));
+
+        Db::query(
+            "UPDATE contexts SET {$assignments}, updated_at = NOW() WHERE id = ?",
+            [...array_values($set), $id],
+        );
+    }
+
+    /** @return array<int, array> students with their coach assignments */
+    public static function students(bool $activeOnly = false): array
+    {
+        return Db::fetchAll(
+            'SELECT * FROM contexts WHERE kind = ?'
+            . ($activeOnly ? ' AND is_active = 1' : '')
+            . ' ORDER BY name',
+            [self::STUDENT],
+        );
+    }
+
+    /** @return array<int, array> the coaches a student is assigned to */
+    public static function coachesOf(int $studentId): array
+    {
+        return Db::fetchAll(
+            'SELECT c.*, l.display_name, l.is_active AS link_active
+             FROM context_links l
+             JOIN contexts c ON c.id = l.coach_id
+             WHERE l.student_id = ?
+             ORDER BY c.name',
+            [$studentId],
+        );
+    }
+
+    public static function unlink(int $coachId, int $studentId): void
+    {
+        Db::query(
+            'DELETE FROM context_links WHERE coach_id = ? AND student_id = ?',
+            [$coachId, $studentId],
+        );
+    }
+
+    public static function setLinkActive(int $coachId, int $studentId, bool $active): void
+    {
+        Db::query(
+            'UPDATE context_links SET is_active = ? WHERE coach_id = ? AND student_id = ?',
+            [$active ? 1 : 0, $coachId, $studentId],
+        );
+    }
+
+    /** How many students a coach has, for the overview. */
+    public static function studentCount(int $coachId): int
+    {
+        return (int) Db::fetchValue(
+            'SELECT COUNT(*) FROM context_links WHERE coach_id = ?',
+            [$coachId],
+        );
+    }
+
+    /** True when nothing has ever been counted for this context. */
+    public static function isUnused(int $contextId): bool
+    {
+        $counted = (int) Db::fetchValue(
+            'SELECT COUNT(*) FROM usage_counts WHERE context_id = ? AND uses > 0',
+            [$contextId],
+        );
+        $events = (int) Db::fetchValue(
+            'SELECT COUNT(*) FROM usage_events WHERE context_id = ? OR coach_id = ?',
+            [$contextId, $contextId],
+        );
+
+        return $counted === 0 && $events === 0;
+    }
+
+    public static function delete(int $contextId): void
+    {
+        Db::query('DELETE FROM contexts WHERE id = ?', [$contextId]);
+    }
+
     public static function link(int $coachId, int $studentId, ?string $displayName = null): void
     {
         Db::query(

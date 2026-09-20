@@ -22,6 +22,41 @@ final class Formatter
     ];
 
     /**
+     * Starting points offered in the admin area. Deliberately free of words so
+     * they suit any interface language; the wording is the coach's to add.
+     */
+    public const PRESETS = [
+        'standard' => [
+            'header' => '**{collection} – {item_label} {item_no}** ({count}×)',
+            'line' => '{n}. {sentence}',
+            'footer' => '',
+            'codeblock' => false,
+            'codeblock_lang' => '',
+        ],
+        'codeblock' => [
+            'header' => '{collection} – {item_label} {item_no} ({count}x)',
+            'line' => '{n}. {sentence}',
+            'footer' => '',
+            'codeblock' => true,
+            'codeblock_lang' => '',
+        ],
+        'plain' => [
+            'header' => '',
+            'line' => '{sentence}',
+            'footer' => '',
+            'codeblock' => false,
+            'codeblock_lang' => '',
+        ],
+        'quote' => [
+            'header' => '**{item_label} {item_no}**',
+            'line' => '> {sentence}',
+            'footer' => '',
+            'codeblock' => false,
+            'codeblock_lang' => '',
+        ],
+    ];
+
+    /**
      * The template to use: the coach's own, else the per-locale default.
      *
      * @return array{header:string, line:string, footer:string, codeblock:bool, codeblock_lang:string}

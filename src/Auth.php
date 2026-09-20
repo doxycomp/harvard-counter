@@ -105,6 +105,14 @@ final class Auth
         Session::regenerate();
     }
 
+    /** Confirm a password for an already signed-in account, e.g. before a change. */
+    public static function verifyPassword(int $adminId, string $password): bool
+    {
+        $hash = Db::fetchValue('SELECT password_hash FROM admin_users WHERE id = ?', [$adminId]);
+
+        return is_string($hash) && password_verify($password, $hash);
+    }
+
     public static function changePassword(int $adminId, string $password): void
     {
         Db::query(

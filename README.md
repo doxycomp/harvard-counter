@@ -10,10 +10,9 @@ supports further collections, including prose passages and other languages.
 
 ## Status
 
-Under construction. The application is usable: installation, coaches and
-students, access links, the sentence picker, counting with undo, and the
-Discord block. The admin interface for managing all of it, the statistics and
-the export are still to come. See
+Feature complete apart from export and import. Installation, coaches and
+students, access links, the sentence picker, counting with undo, the Discord
+template editor, the counter matrix and the statistics are all in place. See
 [docs/BUILDPLAN.md](docs/BUILDPLAN.md) for the full plan and the milestone
 list.
 
@@ -68,8 +67,12 @@ php bin/create_admin.php <name>  # create an administrator or reset a password
 
 ## Coaches, students and access links
 
-Until the admin area grows its own interface for this, coaches and students are
-managed from the command line:
+Both are managed in the admin area under **Coaches** and **Students**, which is
+also where the access link is shown, copied and rotated, and where the Discord
+template is edited with presets and a live preview.
+
+The same thing is available from the command line, which is handy for setting a
+server up in one go:
 
 ```bash
 php bin/contexts.php coach:add "Robin" --locale=de --theme=trans

@@ -73,6 +73,10 @@ $basePath ??= '';
     </form>
 </header>
 
+<?php if (!empty($adminNav)): ?>
+    <?= $view->render('admin/nav', ['active' => $navActive ?? '']) ?>
+<?php endif; ?>
+
 <main class="page">
     <?= $content ?>
 </main>
