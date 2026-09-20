@@ -24,8 +24,10 @@ final class Web
         self::sendHeaders();
         Session::start();
 
-        $applied = self::applyAppearanceRequest();
-        if ($applied) {
+        // Only ever redirect a GET. Redirecting a POST would discard its body,
+        // which would silently swallow a form submitted to a URL that still
+        // carried an appearance parameter.
+        if (self::applyAppearanceRequest() && !self::isPost()) {
             self::redirectWithoutAppearanceParams();
         }
 

@@ -51,6 +51,11 @@ collection-aware from day one.
 PHP 8.5, MariaDB, PDO. No framework, no Composer dependencies — deployment is a
 `git pull`, nothing has to be built on the server.
 
+`pdo_mysql` is the only required extension. `mbstring` and `intl` are used when
+present and fall back to portable implementations when they are not, so a
+stripped down shared host stays viable. `App\Str` and `App\I18n::date()` hold
+those fallbacks.
+
 ```
 /                        <- repository root, parent of the document root
 ├─ public/               <- web server root

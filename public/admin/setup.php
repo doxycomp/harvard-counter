@@ -22,6 +22,7 @@ use App\Db;
 use App\Install;
 use App\Migrator;
 use App\Session;
+use App\Str;
 use App\View;
 use App\Web;
 
@@ -119,7 +120,7 @@ if (Web::isPost()) {
         $password = (string) ($_POST['password'] ?? '');
         $repeat = (string) ($_POST['password_repeat'] ?? '');
 
-        if (mb_strlen($formUsername) < 3) {
+        if (Str::length($formUsername) < 3) {
             $adminError = t('setup.admin.error.username');
         } elseif (($problem = Auth::validatePassword($password, $repeat)) !== null) {
             $adminError = t($problem);

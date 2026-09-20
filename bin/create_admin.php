@@ -22,6 +22,7 @@ require dirname(__DIR__) . '/src/bootstrap.php';
 use App\Auth;
 use App\Config;
 use App\Db;
+use App\Str;
 
 if (!Config::exists()) {
     fwrite(STDERR, "config/config.php is missing. Copy config/config.example.php first.\n");
@@ -29,7 +30,7 @@ if (!Config::exists()) {
 }
 
 $username = $argv[1] ?? null;
-if ($username === null || mb_strlen($username) < 3) {
+if ($username === null || Str::length($username) < 3) {
     fwrite(STDERR, "Usage: php bin/create_admin.php <username>\n");
     exit(1);
 }

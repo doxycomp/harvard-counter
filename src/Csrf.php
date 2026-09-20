@@ -46,7 +46,10 @@ final class Csrf
     {
         $posted = $_POST[self::FIELD] ?? null;
         if (!self::isValid(is_string($posted) ? $posted : null)) {
-            http_response_code(419);
+            // Plain text on purpose: this has to work even when the session,
+            // the templates or the translations are the thing that broke.
+            http_response_code(400);
+            header('Content-Type: text/plain; charset=utf-8');
             exit('Session expired. Please reload the page and try again.');
         }
     }

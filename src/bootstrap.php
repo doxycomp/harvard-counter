@@ -48,3 +48,4 @@ function tn(string $key, int $count, array $vars = []): string
 }
 
 App\Config::load();
+App\ErrorHandler::install();

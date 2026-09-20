@@ -19,8 +19,13 @@ list.
 ## Requirements
 
 - PHP 8.2 or newer (developed and tested against 8.5)
-- MariaDB 10.4 or newer (or a compatible MySQL)
+- MariaDB 10.4 or newer (or a compatible MySQL), verified against 10.4
+- The `pdo_mysql` extension — the only one that is required
 - No Composer dependencies, no build step — deployment is a `git pull`
+
+`mbstring` and `intl` are used when present and fall back to portable
+implementations when they are not, so the application also runs on a stripped
+down shared host.
 
 ## Installation
 
