@@ -361,8 +361,10 @@ Rules the themes must follow:
 So a coach can fork the repository and keep running it on their own server
 without starting from zero.
 
-**Export** — reachable in the frontend through the coach's own token link
-("Export my data") and in the admin area for any or all coaches:
+**Export** — in the admin area: an administrator exports any or all coaches, a
+coach account its own data. (Early versions also offered it on the frontend
+through the coach's token link; that was dropped, since a link that is pasted
+into Discord should not also be the key to a full data dump.)
 
 * **JSON** (machine readable, re-importable): coach, students, Discord
   templates, locale, theme, default collection and all counters.

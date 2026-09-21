@@ -135,8 +135,8 @@ Deactivating a coach ends their access link and their sign-in together.
 
 ## Moving to your own server
 
-A coach can take their data with them. **Export my data** on the frontend, or
-**Data → Export** in the admin area, produces:
+A coach can take their data with them: **Data → Export** in the admin area
+(with a coach account, or by an administrator on their behalf) produces:
 
 - **JSON**, which the admin area can import again, and
 - **CSV**, one row per context and entry, for a spreadsheet.

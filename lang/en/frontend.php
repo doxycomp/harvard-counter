@@ -57,7 +57,6 @@ return [
 
     'demo.notice' => 'Counters are only kept for this browser session. Ask in Discord for a personal link if you want them saved.',
 
-    'export.link' => 'Export my data',
     'export.denied.title' => 'No access link',
     'export.denied.body' => 'Exporting needs a personal access link. Without one there is nothing stored to export — the demo counters live only in this browser session.',
 

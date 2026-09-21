@@ -57,7 +57,6 @@ return [
 
     'demo.notice' => 'Les compteurs ne sont conservés que pour cette session. Demandez un lien personnel sur Discord si vous souhaitez les enregistrer.',
 
-    'export.link' => 'Exporter mes données',
     'export.denied.title' => 'Pas de lien d\'accès',
     'export.denied.body' => 'L\'export nécessite un lien d\'accès personnel. Sans lui, il n\'y a rien à exporter : les compteurs de démonstration ne vivent que dans cette session.',
 
