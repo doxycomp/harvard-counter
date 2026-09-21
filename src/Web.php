@@ -126,10 +126,12 @@ final class Web
         return ($https ? 'https' : 'http') . '://' . $host . $directory . '/';
     }
 
-    /** The full access link for a coach token. */
-    public static function accessLink(string $token): string
+    /** The full access link for a coach (?t=) or student (?s=) token. */
+    public static function accessLink(string $token, string $kind = Contexts::COACH): string
     {
-        return self::baseUrl() . '?t=' . rawurlencode($token);
+        $param = $kind === Contexts::STUDENT ? Visitor::PARAM_STUDENT : Visitor::PARAM_COACH;
+
+        return self::baseUrl() . '?' . $param . '=' . rawurlencode($token);
     }
 
     public static function redirect(string $location, int $status = 303): never

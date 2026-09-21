@@ -74,7 +74,7 @@ $token = $student['access_token'] ?? null;
             <button type="submit"><?= e(t('student.token.create')) ?></button>
         </form>
     <?php else: ?>
-        <?php $link = Web::accessLink((string) $token); ?>
+        <?php $link = Web::accessLink((string) $token, App\Contexts::STUDENT); ?>
         <div class="button-row">
             <button type="button" data-copy="self" data-copy-text="<?= e($link) ?>"
                     data-copied-label="<?= e(t('result.copied')) ?>">

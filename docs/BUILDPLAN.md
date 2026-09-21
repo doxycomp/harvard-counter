@@ -318,7 +318,8 @@ In the admin area:
    `counted = 0`, as long as the event id is still in the session.
 6. A line reading "Still open: 7, 41, 58 (0× each)" — the least used items for
    the current selection, clickable. Plus a collapsible overview of all items
-   with their counters.
+   with their counters. Both appear only once a list is on screen: shown on
+   the empty picker they would tell the student which lists are coming.
 
 Clipboard via `navigator.clipboard` with a `document.execCommand` fallback
 (requires HTTPS or localhost).
@@ -488,6 +489,11 @@ used", the coach totals and every lesson statistic are untouched by
 construction. A student sees their self-practice figure with the lesson figure
 beside it; a coach sees a student's self-practice beside their lesson figure
 and in the statistics. Student links are revocable; coach links only rotate.
+
+Student links use `?s=`, coach links keep `?t=` (they predate student links and
+are already out in Discord messages). Each parameter resolves only its own
+kind, so the letter can be trusted at a glance: an `?s=` link cannot open a
+coach's view, and `?t=` marks the link a coach should not pass on.
 
 ### Coach accounts (migration 0002)
 

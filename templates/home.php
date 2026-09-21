@@ -21,6 +21,7 @@ use App\View;
  * @var string|null $demoNotice
  * @var string|null $flash
  * @var callable $link
+ * @var string|null $carryName   't' or 's', the parameter the token came in under
  * @var string|null $carryToken
  * @var string|null $coachTotalLabel
  * @var int      $studentCoachCount
@@ -57,6 +58,7 @@ use App\View;
     'leastUsed' => $leastUsed,
     'lowestCount' => $lowestCount,
     'link' => $link,
+    'carryName' => $carryName,
     'carryToken' => $carryToken,
 ]) ?>
 

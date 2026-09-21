@@ -101,14 +101,20 @@ carry the address visitors actually use.
 
 A student can be given an access link of their own (admin area → Students →
 the student → *Own access link*). With it they pick and count sentences
-themselves. That is counted as **self-practice**, in separate tables: the lesson
-counters, "least used" and every lesson statistic stay exactly what they were.
-Coaches see a student's self-practice next to the lesson figure and in the
-statistics.
+themselves. That is counted as **self-practice**, in separate tables: the
+lesson counters, "least used" and every lesson statistic stay exactly what they
+were. Coaches see a student's self-practice next to the lesson figure and in
+the statistics.
+
+The letter in the link tells the two kinds apart: coach links use `?t=`,
+student links `?s=`, and each parameter only ever resolves its own kind — a
+coach token under `?s=`, or a student token under `?t=`, is treated like an
+unknown one. So an `?s=` link can never open a coach's view, and a link with
+`?t=` is always the one a coach keeps to themselves.
 
 ## Accounts and roles
 
-There are two kinds of sign-in account (admin area → *Accounts*):
+There are two kinds of sign-in account (admin area → *Users*):
 
 - **Administrator** — sees and manages everything.
 - **Coach** — tied to one coach and limited to it: that coach's profile and

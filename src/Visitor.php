@@ -18,6 +18,15 @@ final class Visitor
     public const COOKIE_CONTEXT = 'hc_ctx';
 
     /**
+     * Coach links use ?t=, student links ?s=, and each parameter resolves only
+     * its own kind. That makes the letter trustworthy: an ?s= link can never
+     * open a coach's view, and ?t= is always the link a coach keeps to
+     * themselves. ?t= predates student links, which is why coaches kept it.
+     */
+    public const PARAM_COACH = 't';
+    public const PARAM_STUDENT = 's';
+
+    /**
      * @param array<string, mixed>|null $coach
      * @param array<string, mixed>|null $student  set only for a student's own link
      * @param list<array{id:int, label:string, kind:string}> $selectable
@@ -55,13 +64,24 @@ final class Visitor
         return $this->coach === null ? null : (string) $this->coach['name'];
     }
 
-    /**
-     * @param string|null $token      from the query string
-     * @param int|null    $contextId  the requested context row
-     */
-    public static function resolve(?string $token, ?int $contextId): self
+    /** The query parameter this visitor's own link uses, or null in the demo. */
+    public function tokenParam(): ?string
     {
-        $context = self::resolveContext($token);
+        return match (true) {
+            $this->coach !== null => self::PARAM_COACH,
+            $this->student !== null => self::PARAM_STUDENT,
+            default => null,
+        };
+    }
+
+    /**
+     * @param string|null $coachToken    ?t= from the query string
+     * @param string|null $studentToken  ?s= from the query string
+     * @param int|null    $contextId     the requested context row
+     */
+    public static function resolve(?string $coachToken, ?string $studentToken, ?int $contextId): self
+    {
+        $context = self::resolveContext($coachToken, $studentToken);
 
         if ($context === null) {
             return new self(null, null, [], null, new SessionCounterStore());
@@ -103,18 +123,26 @@ final class Visitor
      *
      * @return array<string, mixed>|null
      */
-    private static function resolveContext(?string $token): ?array
+    private static function resolveContext(?string $coachToken, ?string $studentToken): ?array
     {
+        [$token, $kind] = match (true) {
+            $coachToken !== null => [$coachToken, Contexts::COACH],
+            $studentToken !== null => [$studentToken, Contexts::STUDENT],
+            default => [null, null],
+        };
+
         if ($token !== null) {
             $context = Contexts::findByToken($token);
-            if ($context !== null) {
+
+            // A token under the other kind's parameter is treated exactly like
+            // an unknown one — demo mode, and no error page that would confirm
+            // the token exists under the other letter.
+            if ($context !== null && $context['kind'] === $kind) {
                 Session::setPreference(self::COOKIE_TOKEN, $token);
 
                 return $context;
             }
 
-            // An invalid token is treated as no token: demo mode, no error
-            // page that would confirm which tokens exist.
             return null;
         }
 
