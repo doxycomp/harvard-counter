@@ -32,7 +32,8 @@ if (Install::status() !== Install::READY) {
     exit;
 }
 
-$visitor = Visitor::resolve(Web::stringParam('t'), null);
+// Coach links only: a student link under ?s= has nothing to export.
+$visitor = Visitor::resolve(Web::stringParam(Visitor::PARAM_COACH), null, null);
 
 // Exporting is for coaches moving their data; a student's link and the demo
 // have no coach to export.

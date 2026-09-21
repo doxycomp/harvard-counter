@@ -58,9 +58,14 @@ if (isset($errorPages[$status])) {
 $param = static fn(string $name): ?string
     => Web::stringParam($name) ?? Web::stringParam($name, $_POST);
 
-$token = $param('t');
+$coachToken = $param(Visitor::PARAM_COACH);
+$studentToken = $param(Visitor::PARAM_STUDENT);
 $requestedContext = $param('ctx');
-$visitor = Visitor::resolve($token, $requestedContext === null ? null : (int) $requestedContext);
+$visitor = Visitor::resolve(
+    $coachToken,
+    $studentToken,
+    $requestedContext === null ? null : (int) $requestedContext,
+);
 
 if ($visitor->coach !== null) {
     $vars = Web::applyContextPreferences(
@@ -74,7 +79,13 @@ $view->share($vars);
 
 // Keep the token in links only when it arrived in the URL; a visitor who is
 // recognised by cookie should not have it put back into their address bar.
-$carryToken = $token !== null && !$visitor->isDemo() ? $token : null;
+// It goes back under the same letter it came in with.
+$carryName = $visitor->tokenParam();
+$carryToken = match ($carryName) {
+    Visitor::PARAM_COACH => $coachToken,
+    Visitor::PARAM_STUDENT => $studentToken,
+    default => null,
+};
 
 // ------------------------------------------------------------- collection
 
@@ -100,10 +111,10 @@ $collectionId = (int) $collection['id'];
 $itemCount = (int) $collection['item_count'];
 
 /** Build a link to this page, carrying the identity bits. */
-$link = static function (array $extra = []) use ($carryToken, $collection, $visitor): string {
+$link = static function (array $extra = []) use ($carryName, $carryToken, $collection, $visitor): string {
     $query = [];
-    if ($carryToken !== null) {
-        $query['t'] = $carryToken;
+    if ($carryName !== null && $carryToken !== null) {
+        $query[$carryName] = $carryToken;
     }
     $query['c'] = $collection['slug'];
     if ($visitor->selected !== null) {
@@ -292,6 +303,7 @@ echo $view->page('home', [
     'demoNotice' => $demoNotice,
     'flash' => Session::pull('flash'),
     'link' => $link,
+    'carryName' => $carryName,
     'carryToken' => $carryToken,
     'coachTotalLabel' => $visitor->coachName(),
     'studentCoachCount' => $visitor->hasStudentSelected()

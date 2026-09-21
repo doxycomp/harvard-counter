@@ -22,6 +22,7 @@ use App\Csrf;
  * @var int[]    $leastUsed
  * @var int      $lowestCount
  * @var callable $link
+ * @var string|null $carryName
  * @var string|null $carryToken
  */
 $showCollectionPicker = count($collections) > 1;
@@ -30,8 +31,8 @@ $showContextPicker = !$visitor->isDemo() && count($visitor->selectable) > 0;
 <div class="card">
     <?php if ($showCollectionPicker || $showContextPicker): ?>
         <form method="get" class="picker-identity" data-autosubmit>
-            <?php if ($carryToken !== null): ?>
-                <input type="hidden" name="t" value="<?= e($carryToken) ?>">
+            <?php if ($carryName !== null && $carryToken !== null): ?>
+                <input type="hidden" name="<?= e($carryName) ?>" value="<?= e($carryToken) ?>">
             <?php endif; ?>
             <?php if ($number !== null): ?>
                 <input type="hidden" name="n" value="<?= (int) $number ?>">
@@ -112,7 +113,9 @@ $showContextPicker = !$visitor->isDemo() && count($visitor->selectable) > 0;
         </div>
     </form>
 
-    <?php if ($leastUsed !== []): ?>
+    <?php // Like the overview: only once a list is on screen, so the hint does not
+          // give away which lists are coming before the student has picked a number. ?>
+    <?php if ($number !== null && $leastUsed !== []): ?>
         <p class="small muted picker-hint">
             <?= e(t('picker.least_used', ['count' => $lowestCount])) ?>
             <?php foreach ($leastUsed as $index => $itemNo): ?>

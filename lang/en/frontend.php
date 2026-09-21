@@ -76,4 +76,5 @@ return [
 
     'footer.license' => 'Source code licensed under the MIT License.',
     'footer.attribution' => 'The Harvard Sentences are in the public domain. They were developed by Harvard University\'s Psycho-Acoustic Laboratory and published in the 1969 IEEE Recommended Practice for Speech Quality Measurements.',
+    'footer.attribution_fharvard' => 'The Fharvard Sentences are by Vincent Aubanel, Clémence Bayard, Antje Strauss and Jean-Luc Schwartz (doi:10.5281/zenodo.1462854), licensed under CC BY 4.0.',
 ];

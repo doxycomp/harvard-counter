@@ -76,4 +76,5 @@ return [
 
     'footer.license' => 'Le code source est publié sous licence MIT.',
     'footer.attribution' => 'Les Harvard Sentences appartiennent au domaine public. Elles ont été développées par le Psycho-Acoustic Laboratory de l\'université Harvard et publiées en 1969 dans l\'IEEE Recommended Practice for Speech Quality Measurements.',
+    'footer.attribution_fharvard' => 'Les phrases Fharvard sont de Vincent Aubanel, Clémence Bayard, Antje Strauss et Jean-Luc Schwartz (doi:10.5281/zenodo.1462854), sous licence CC BY 4.0.',
 ];

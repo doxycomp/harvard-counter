@@ -4,9 +4,16 @@ A small web application for voice coaches. Ask a student for a number, get the
 matching practice sentences, copy them into Discord, and keep track of how
 often each one has been used — per coach and per student.
 
-The sentences shipped with this repository are the **Harvard Sentences** (IEEE,
-1969): 72 lists of 10 phonetically balanced English sentences. The data model
-supports further collections, including prose passages and other languages.
+Two sentence collections ship with this repository:
+
+- the **Harvard Sentences** (IEEE, 1969): 72 lists of 10 phonetically balanced
+  English sentences, and
+- the **Fharvard Sentences** (2018): 70 lists of 10 phonetically balanced
+  French sentences built on the same model.
+
+As soon as more than one collection is active, the frontend offers a choice
+between them; counters, statistics and exports are kept per collection. The
+data model also supports prose passages and further languages.
 
 ## Status
 
@@ -101,14 +108,20 @@ carry the address visitors actually use.
 
 A student can be given an access link of their own (admin area → Students →
 the student → *Own access link*). With it they pick and count sentences
-themselves. That is counted as **self-practice**, in separate tables: the lesson
-counters, "least used" and every lesson statistic stay exactly what they were.
-Coaches see a student's self-practice next to the lesson figure and in the
-statistics.
+themselves. That is counted as **self-practice**, in separate tables: the
+lesson counters, "least used" and every lesson statistic stay exactly what they
+were. Coaches see a student's self-practice next to the lesson figure and in
+the statistics.
+
+The letter in the link tells the two kinds apart: coach links use `?t=`,
+student links `?s=`, and each parameter only ever resolves its own kind — a
+coach token under `?s=`, or a student token under `?t=`, is treated like an
+unknown one. So an `?s=` link can never open a coach's view, and a link with
+`?t=` is always the one a coach keeps to themselves.
 
 ## Accounts and roles
 
-There are two kinds of sign-in account (admin area → *Accounts*):
+There are two kinds of sign-in account (admin area → *Users*):
 
 - **Administrator** — sees and manages everything.
 - **Coach** — tied to one coach and limited to it: that coach's profile and
@@ -241,3 +254,13 @@ The source code for this project is licensed under the MIT License.
 public domain. They were originally developed by Harvard University's
 Psycho-Acoustic Laboratory and published in the 1969 IEEE Recommended Practice
 for Speech Quality Measurements.
+
+The Fharvard Sentences in `data/collections/fharvard-fr/` are taken from
+["The Fharvard corpus"](https://doi.org/10.5281/zenodo.1462854) by Vincent
+Aubanel, Clémence Bayard, Antje Strauss and Jean-Luc Schwartz, licensed under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The corpus is
+described in Aubanel et al., *Speech Communication* (2020),
+[doi:10.1016/j.specom.2020.07.004](https://doi.org/10.1016/j.specom.2020.07.004).
+Only the sentence text is included; the keyword emphasis of the original PDF was
+dropped and whitespace normalised. The audio recordings and phonetic
+transcriptions are not part of this repository.

@@ -93,7 +93,8 @@ drawn and counted.
 | Collection | Items | Lines per item |
 |---|---|---|
 | Harvard Sentences | 72 lists | 10 sentences |
-| German / French sentence list | n lists | m sentences |
+| Fharvard Sentences (French, shipped) | 70 lists | 10 sentences |
+| German sentence list | n lists | m sentences |
 | Rainbow Passage | 1 passage | n paragraphs |
 | Comma Gets a Cure | 1 passage | n paragraphs |
 | Community one-liners | n sentences | 1 |
@@ -318,7 +319,8 @@ In the admin area:
    `counted = 0`, as long as the event id is still in the session.
 6. A line reading "Still open: 7, 41, 58 (0× each)" — the least used items for
    the current selection, clickable. Plus a collapsible overview of all items
-   with their counters.
+   with their counters. Both appear only once a list is on screen: shown on
+   the empty picker they would tell the student which lists are coming.
 
 Clipboard via `navigator.clipboard` with a `document.execCommand` fallback
 (requires HTTPS or localhost).
@@ -489,6 +491,11 @@ construction. A student sees their self-practice figure with the lesson figure
 beside it; a coach sees a student's self-practice beside their lesson figure
 and in the statistics. Student links are revocable; coach links only rotate.
 
+Student links use `?s=`, coach links keep `?t=` (they predate student links and
+are already out in Discord messages). Each parameter resolves only its own
+kind, so the letter can be trusted at a glance: an `?s=` link cannot open a
+coach's view, and `?t=` marks the link a coach should not pass on.
+
 ### Coach accounts (migration 0002)
 
 `admin_users` gained `role` (`admin` | `coach`) and `coach_id`. A coach account
@@ -513,6 +520,24 @@ and a gitleaks pre-commit hook in `.githooks/`. CI runs all of it, plus the
 syntax check under PHP 8.2 and a gitleaks scan of the full history. Composer
 and npm are development dependencies only; deployment remains a `git pull`.
 
+### Second collection: Fharvard (French)
+
+`data/collections/fharvard-fr/` holds the Fharvard corpus (Aubanel, Bayard,
+Strauss & Schwartz, 2018; Zenodo 10.5281/zenodo.1462854): 70 lists of 10
+French sentences, phonetically balanced after the Harvard model. It is licensed
+CC BY 4.0, so unlike the Harvard lists it needs visible credit: the footer
+carries it in every locale, and `meta.json` records authors, DOI, licence and
+the changes made (text taken from the PDF, keyword emphasis dropped, whitespace
+normalised — the PDF omits spaces at some keyword boundaries, which were
+restored by comparing font runs). Numbering follows the source, so "list 12"
+means the same thing as in the paper and the audio recordings.
+
+The sentences carry `lang` from `content_lang`, independently of the interface
+language, so screen readers pronounce French sentences as French in a German
+interface. Nothing else needed to change: the collection picker appears as soon
+as two collections are active, and counters, statistics and exports were keyed
+per collection from the start.
+
 ---
 
 ## 16. Deliberately out of scope
@@ -534,8 +559,12 @@ public domain. They were originally developed by Harvard University's
 Psycho-Acoustic Laboratory and published in the 1969 IEEE Recommended Practice
 for Speech Quality Measurements.
 
+The Fharvard Sentences are by Vincent Aubanel, Clémence Bayard, Antje Strauss
+and Jean-Luc Schwartz (doi:10.5281/zenodo.1462854), licensed under CC BY 4.0.
+
 Further collections come with their own rights, which is why every collection
 carries `source_url`, `attribution` and `license_note` in the data model and
-shows them in the frontend. The licence of a collection has to be checked
+shows them in the admin area; collections that require credit also get a
+footer line. The licence of a collection has to be checked
 before it is shipped in the repository — Comma Gets a Cure, for instance, is
 not public domain and may only be used with credit to its authors.
