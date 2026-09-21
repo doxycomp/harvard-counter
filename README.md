@@ -110,8 +110,9 @@ A student can be given an access link of their own (admin area → Students →
 the student → *Own access link*). With it they pick and count sentences
 themselves. That is counted as **self-practice**, in separate tables: the
 lesson counters, "least used" and every lesson statistic stay exactly what they
-were. Coaches see a student's self-practice next to the lesson figure and in
-the statistics.
+were. Coaches see a student's self-practice next to the lesson figure, and in
+the statistics, where a click on the student breaks it down per list: how
+often alone, how often in lessons, and when last practised alone.
 
 The letter in the link tells the two kinds apart: coach links use `?t=`,
 student links `?s=`, and each parameter only ever resolves its own kind — a

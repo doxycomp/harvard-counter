@@ -108,7 +108,7 @@ final class Stats
      * Self-practice per student, kept apart from the lesson figures above.
      * For a coach: their students; for null: every student.
      *
-     * @return list<array{name:string, uses:int, last:?string}>
+     * @return list<array{id:int, name:string, uses:int, last:?string}>
      */
     public static function selfPractice(?int $coachId): array
     {
@@ -116,7 +116,7 @@ final class Stats
         $params = $coachId === null ? [] : [$coachId];
 
         $rows = Db::fetchAll(
-            "SELECT c.name, COUNT(*) AS uses, MAX(s.created_at) AS last_used
+            "SELECT c.id, c.name, COUNT(*) AS uses, MAX(s.created_at) AS last_used
              FROM self_events s
              JOIN contexts c ON c.id = s.context_id
              {$join}
@@ -127,9 +127,50 @@ final class Stats
         );
 
         return array_map(static fn(array $row): array => [
+            'id' => (int) $row['id'],
             'name' => (string) $row['name'],
             'uses' => (int) $row['uses'],
             'last' => $row['last_used'] ?? null,
+        ], $rows);
+    }
+
+    /**
+     * One student's practice on their own, per item of a collection, with the
+     * lesson counter beside it for comparison.
+     *
+     * Only items that came up at all, alone or in a lesson, are returned; the
+     * rest would be a long column of zeros. The self figure is the counter,
+     * so undone uses are already out of it; the date is the last use that
+     * stayed counted.
+     *
+     * Not scoped by coach: the lesson counter is shared between a student's
+     * coaches, and the caller decides who may see the student at all.
+     *
+     * @return list<array{item_no: int, self: int, lesson: int, last: ?string}>
+     */
+    public static function selfBreakdown(int $studentId, int $collectionId): array
+    {
+        $rows = Db::fetchAll(
+            'SELECT i.item_no, COALESCE(s.uses, 0) AS self_uses, COALESCE(u.uses, 0) AS lesson_uses, e.last_used
+             FROM collection_items i
+             LEFT JOIN self_counts s ON s.item_id = i.id AND s.context_id = ?
+             LEFT JOIN usage_counts u ON u.item_id = i.id AND u.context_id = ?
+             LEFT JOIN (
+                 SELECT item_id, MAX(created_at) AS last_used
+                 FROM self_events
+                 WHERE context_id = ? AND counted = 1
+                 GROUP BY item_id
+             ) e ON e.item_id = i.id
+             WHERE i.collection_id = ? AND (s.uses > 0 OR u.uses > 0)
+             ORDER BY i.item_no',
+            [$studentId, $studentId, $studentId, $collectionId],
+        );
+
+        return array_map(static fn(array $row): array => [
+            'item_no' => (int) $row['item_no'],
+            'self' => (int) $row['self_uses'],
+            'lesson' => (int) $row['lesson_uses'],
+            'last' => isset($row['last_used']) ? (string) $row['last_used'] : null,
         ], $rows);
     }
 

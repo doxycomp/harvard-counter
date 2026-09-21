@@ -493,6 +493,13 @@ construction. A student sees their self-practice figure with the lesson figure
 beside it; a coach sees a student's self-practice beside their lesson figure
 and in the statistics. Student links are revocable; coach links only rotate.
 
+The statistics list self-practice per student; a click on a name breaks it
+down per list of the selected collection: how often alone, how often in
+lessons, and when last practised alone, plus how many lists were covered
+alone. Lists that came up neither way are left out rather than shown as a
+column of zeros. The student id is checked like every other id, so a coach
+account only opens its own students.
+
 Student links use `?s=`, coach links keep `?t=` (they predate student links and
 are already out in Discord messages). Each parameter resolves only its own
 kind, so the letter can be trusted at a glance: an `?s=` link cannot open a

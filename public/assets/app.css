@@ -591,6 +591,10 @@ button.button--danger {
   opacity: 0.6;
 }
 
+.data-table tr.is-selected td {
+  background: var(--accent-soft);
+}
+
 .numeric {
   text-align: end;
   font-variant-numeric: tabular-nums;
