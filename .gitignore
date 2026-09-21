@@ -10,3 +10,8 @@
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Development tooling
+/node_modules/
+/vendor/
+.php-cs-fixer.cache

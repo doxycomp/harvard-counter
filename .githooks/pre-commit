@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Refuse to commit anything that looks like a secret.
+#
+# Enabled per clone with:  git config core.hooksPath .githooks
+# (`npm install` does this for you through the "prepare" script.)
+#
+# config/config.php is gitignored, but database passwords and setup tokens
+# have a way of ending up in a README, a test script or a pasted snippet.
+# CI runs the same scan over the full history as a backstop.
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+    echo "pre-commit: gitleaks is not installed, so staged changes cannot be scanned." >&2
+    echo "            Install it (https://github.com/gitleaks/gitleaks#installing)," >&2
+    echo "            e.g. 'winget install Gitleaks.Gitleaks' or 'brew install gitleaks'." >&2
+    exit 1
+fi
+
+exec gitleaks git --pre-commit --staged --redact --no-banner --verbose
