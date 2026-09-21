@@ -93,6 +93,7 @@ $basePath ??= '';
     <div class="site-footer__inner">
         <p class="small"><?= e(t('footer.license')) ?></p>
         <p class="small"><?= e(t('footer.attribution')) ?></p>
+        <p class="small"><?= e(t('footer.attribution_fharvard')) ?></p>
     </div>
 </footer>
 

@@ -93,7 +93,8 @@ drawn and counted.
 | Collection | Items | Lines per item |
 |---|---|---|
 | Harvard Sentences | 72 lists | 10 sentences |
-| German / French sentence list | n lists | m sentences |
+| Fharvard Sentences (French, shipped) | 70 lists | 10 sentences |
+| German sentence list | n lists | m sentences |
 | Rainbow Passage | 1 passage | n paragraphs |
 | Comma Gets a Cure | 1 passage | n paragraphs |
 | Community one-liners | n sentences | 1 |
@@ -519,6 +520,24 @@ and a gitleaks pre-commit hook in `.githooks/`. CI runs all of it, plus the
 syntax check under PHP 8.2 and a gitleaks scan of the full history. Composer
 and npm are development dependencies only; deployment remains a `git pull`.
 
+### Second collection: Fharvard (French)
+
+`data/collections/fharvard-fr/` holds the Fharvard corpus (Aubanel, Bayard,
+Strauss & Schwartz, 2018; Zenodo 10.5281/zenodo.1462854): 70 lists of 10
+French sentences, phonetically balanced after the Harvard model. It is licensed
+CC BY 4.0, so unlike the Harvard lists it needs visible credit: the footer
+carries it in every locale, and `meta.json` records authors, DOI, licence and
+the changes made (text taken from the PDF, keyword emphasis dropped, whitespace
+normalised — the PDF omits spaces at some keyword boundaries, which were
+restored by comparing font runs). Numbering follows the source, so "list 12"
+means the same thing as in the paper and the audio recordings.
+
+The sentences carry `lang` from `content_lang`, independently of the interface
+language, so screen readers pronounce French sentences as French in a German
+interface. Nothing else needed to change: the collection picker appears as soon
+as two collections are active, and counters, statistics and exports were keyed
+per collection from the start.
+
 ---
 
 ## 16. Deliberately out of scope
@@ -540,8 +559,12 @@ public domain. They were originally developed by Harvard University's
 Psycho-Acoustic Laboratory and published in the 1969 IEEE Recommended Practice
 for Speech Quality Measurements.
 
+The Fharvard Sentences are by Vincent Aubanel, Clémence Bayard, Antje Strauss
+and Jean-Luc Schwartz (doi:10.5281/zenodo.1462854), licensed under CC BY 4.0.
+
 Further collections come with their own rights, which is why every collection
 carries `source_url`, `attribution` and `license_note` in the data model and
-shows them in the frontend. The licence of a collection has to be checked
+shows them in the admin area; collections that require credit also get a
+footer line. The licence of a collection has to be checked
 before it is shipped in the repository — Comma Gets a Cure, for instance, is
 not public domain and may only be used with credit to its authors.

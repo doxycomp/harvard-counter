@@ -9,6 +9,7 @@ use App\Csrf;
  * @var array  $result
  * @var string $itemLabel
  * @var string $collectionName
+ * @var string $contentLang  language of the sentences, not of the interface
  * @var string|null $coachTotalLabel
  * @var int    $studentCoachCount
  */
@@ -52,7 +53,7 @@ $blockId = 'discord-block';
 
     <p class="small muted"><?= e(t('result.copy_hint')) ?></p>
 
-    <ol class="sentences">
+    <ol class="sentences" lang="<?= e($contentLang) ?>">
         <?php foreach ($result['lines'] as $line): ?>
             <li>
                 <button type="button" class="sentence"
@@ -83,6 +84,6 @@ $blockId = 'discord-block';
 
     <details class="result__block">
         <summary><?= e(t('result.show_block')) ?></summary>
-        <pre id="<?= $blockId ?>" class="discord-block"><?= e($result['discord']) ?></pre>
+        <pre id="<?= $blockId ?>" class="discord-block" lang="<?= e($contentLang) ?>"><?= e($result['discord']) ?></pre>
     </details>
 </section>

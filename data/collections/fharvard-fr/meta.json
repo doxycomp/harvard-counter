@@ -1,0 +1,29 @@
+{
+  "slug": "fharvard-fr",
+  "content_lang": "fr",
+  "names": {
+    "en": "Fharvard Sentences (French)",
+    "de": "Fharvard-Sätze (Französisch)",
+    "fr": "Phrases Fharvard"
+  },
+  "item_labels": {
+    "en": "List",
+    "de": "Liste",
+    "fr": "Liste"
+  },
+  "descriptions": {
+    "en": "70 lists of 10 phonetically balanced French sentences, modelled on the Harvard Sentences.",
+    "de": "70 Listen mit je 10 phonetisch ausgewogenen französischen Sätzen nach dem Vorbild der Harvard Sentences.",
+    "fr": "70 listes de 10 phrases françaises phonétiquement équilibrées, sur le modèle des Harvard Sentences."
+  },
+  "source_url": "https://doi.org/10.5281/zenodo.1462854",
+  "attribution": "\"The Fharvard corpus\" by Vincent Aubanel, Clémence Bayard, Antje Strauss and Jean-Luc Schwartz (2018), doi:10.5281/zenodo.1462854, licensed under CC BY 4.0. Described in Speech Communication (2020), doi:10.1016/j.specom.2020.07.004. Changes: sentence text only, taken from the PDF; keyword emphasis removed and whitespace normalised.",
+  "license_note": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Credit the authors when you use or redistribute the sentences.",
+  "sort_order": 20,
+  "is_active": true,
+  "items_file": "items.csv",
+  "expect": {
+    "items": 70,
+    "lines_per_item": 10
+  }
+}
