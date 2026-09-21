@@ -76,4 +76,5 @@ return [
 
     'footer.license' => 'Der Quellcode steht unter der MIT-Lizenz.',
     'footer.attribution' => 'Die Harvard Sentences sind gemeinfrei. Sie wurden vom Psycho-Acoustic Laboratory der Harvard University entwickelt und 1969 in der IEEE Recommended Practice for Speech Quality Measurements veröffentlicht.',
+    'footer.attribution_fharvard' => 'Die Fharvard-Sätze stammen von Vincent Aubanel, Clémence Bayard, Antje Strauss und Jean-Luc Schwartz (doi:10.5281/zenodo.1462854) und stehen unter der Lizenz CC BY 4.0.',
 ];

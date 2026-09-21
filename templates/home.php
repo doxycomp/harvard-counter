@@ -68,6 +68,7 @@ use App\View;
         'result' => $result,
         'itemLabel' => $itemLabel,
         'collectionName' => $collectionName,
+        'contentLang' => (string) $collection['content_lang'],
         'coachTotalLabel' => $coachTotalLabel,
         'studentCoachCount' => $studentCoachCount,
     ]) ?>
