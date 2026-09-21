@@ -5,11 +5,12 @@ declare(strict_types=1);
 use App\Csrf;
 
 /**
- * @var array      $students
- * @var array      $coaches
- * @var array      $messages
+ * @var list<array<string, mixed>> $students
+ * @var list<array<string, mixed>> $coaches   empty for a coach account
+ * @var bool       $isAdmin
+ * @var list<array{type:string, text:string}> $messages
  * @var string     $formError
- * @var array|null $duplicateOf
+ * @var array<string, mixed>|null $duplicateOf
  * @var string     $submittedName
  * @var int|null   $submittedCoach
  */
@@ -37,18 +38,20 @@ use App\Csrf;
                    value="<?= e($submittedName) ?>">
         </div>
 
-        <div class="field">
-            <label for="new-coach"><?= e(t('student.coach')) ?></label>
-            <select id="new-coach" name="coach_id">
-                <option value=""><?= e(t('student.coach.none')) ?></option>
-                <?php foreach ($coaches as $coach): ?>
-                    <option value="<?= (int) $coach['id'] ?>"
-                        <?= $submittedCoach === (int) $coach['id'] ? 'selected' : '' ?>>
-                        <?= e((string) $coach['name']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+        <?php if ($isAdmin): ?>
+            <div class="field">
+                <label for="new-coach"><?= e(t('student.coach')) ?></label>
+                <select id="new-coach" name="coach_id">
+                    <option value=""><?= e(t('student.coach.none')) ?></option>
+                    <?php foreach ($coaches as $coach): ?>
+                        <option value="<?= (int) $coach['id'] ?>"
+                            <?= $submittedCoach === (int) $coach['id'] ? 'selected' : '' ?>>
+                            <?= e((string) $coach['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        <?php endif; ?>
 
         <?php if ($duplicateOf !== null): ?>
             <div class="field">
@@ -74,7 +77,9 @@ use App\Csrf;
             <thead>
             <tr>
                 <th><?= e(t('student.name')) ?></th>
-                <th><?= e(t('student.coaches')) ?></th>
+                <?php if ($isAdmin): ?>
+                    <th><?= e(t('student.coaches')) ?></th>
+                <?php endif; ?>
                 <th></th>
             </tr>
             </thead>
@@ -86,22 +91,30 @@ use App\Csrf;
                         <?php if ((int) $student['is_active'] !== 1): ?>
                             <span class="badge"><?= e(t('common.inactive')) ?></span>
                         <?php endif; ?>
-                    </td>
-                    <td data-label="<?= e(t('student.coaches')) ?>">
-                        <?php if ($student['coaches'] === []): ?>
-                            <span class="muted"><?= e(t('student.coach.none')) ?></span>
-                        <?php else: ?>
-                            <?= e(implode(', ', array_map(
-                                static fn (array $c): string => (string) ($c['display_name'] ?? '') !== ''
-                                    ? $c['name'] . ' (' . $c['display_name'] . ')'
-                                    : (string) $c['name'],
-                                $student['coaches'],
-                            ))) ?>
-                            <?php if (count($student['coaches']) > 1): ?>
-                                <span class="badge badge--info"><?= e(t('student.shared')) ?></span>
-                            <?php endif; ?>
+                        <?php if (($student['access_token'] ?? null) !== null): ?>
+                            <span class="badge badge--info"><?= e(t('student.token.badge')) ?></span>
+                        <?php endif; ?>
+                        <?php if (!$isAdmin && $student['shared']): ?>
+                            <span class="badge badge--info"><?= e(t('student.shared')) ?></span>
                         <?php endif; ?>
                     </td>
+                    <?php if ($isAdmin): ?>
+                        <td data-label="<?= e(t('student.coaches')) ?>">
+                            <?php if ($student['coaches'] === []): ?>
+                                <span class="muted"><?= e(t('student.coach.none')) ?></span>
+                            <?php else: ?>
+                                <?= e(implode(', ', array_map(
+                                    static fn (array $c): string => (string) ($c['display_name'] ?? '') !== ''
+                                        ? $c['name'] . ' (' . $c['display_name'] . ')'
+                                        : (string) $c['name'],
+                                    $student['coaches'],
+                                ))) ?>
+                                <?php if ($student['shared']): ?>
+                                    <span class="badge badge--info"><?= e(t('student.shared')) ?></span>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </td>
+                    <?php endif; ?>
                     <td>
                         <a class="button button--quiet" href="students.php?id=<?= (int) $student['id'] ?>">
                             <?= e(t('common.edit')) ?>

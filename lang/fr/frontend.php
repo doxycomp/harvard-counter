@@ -6,6 +6,9 @@ return [
     'app.name' => 'Harvard Counter',
     'app.tagline' => 'Phrases d\'entraînement pour le travail de la voix',
 
+    'nav.login' => 'Connexion',
+    'nav.admin' => 'Administration',
+
     'appearance.language' => 'Langue',
     'appearance.theme' => 'Thème de couleurs',
     'appearance.mode' => 'Apparence',
@@ -19,6 +22,9 @@ return [
     'theme.name.pastel' => 'Pastel',
     'theme.name.mono' => 'Noir et blanc',
     'theme.name.trans' => 'Trans',
+    'theme.name.nonbinary' => 'Non-binaire',
+    'theme.name.sapphic' => 'Saphique',
+    'theme.name.ace' => 'Ace',
 
     'home.title' => 'Phrases d\'entraînement',
     'home.intro' => 'Demandez un numéro, obtenez les phrases correspondantes et voyez combien de fois elles ont déjà servi.',
@@ -30,6 +36,7 @@ return [
     'picker.number.hint' => 'Un numéro au choix entre 1 et {max}.',
     'picker.submit' => 'Afficher les phrases',
     'picker.random' => 'Choisir au hasard',
+    'picker.reset' => 'Recommencer',
     'picker.error.number' => 'Veuillez saisir un numéro entre 1 et {max}.',
     'picker.least_used' => 'Les moins utilisées ({count}×) :',
 
@@ -53,6 +60,11 @@ return [
     'export.link' => 'Exporter mes données',
     'export.denied.title' => 'Pas de lien d\'accès',
     'export.denied.body' => 'L\'export nécessite un lien d\'accès personnel. Sans lui, il n\'y a rien à exporter : les compteurs de démonstration ne vivent que dans cette session.',
+
+    'self.notice' => 'Bonjour {name} ! Tu t\'entraînes seul·e ici — c\'est compté à part des cours.',
+    'result.self_uses' => 'Travaillée seul·e : {count}×',
+    'result.lesson_uses' => 'En cours : {count}×',
+    'result.self_uses_student' => 'Également travaillée seul·e : {count}×',
 
     'error.not_configured.title' => 'Configuration manquante',
     'error.not_configured.body' => 'Copiez config/config.example.php vers config/config.php et renseignez les identifiants de la base de données.',

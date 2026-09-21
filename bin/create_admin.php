@@ -29,7 +29,7 @@ if (!Config::exists()) {
     exit(1);
 }
 
-$username = $argv[1] ?? null;
+$username = $_SERVER['argv'][1] ?? null;
 if ($username === null || Str::length($username) < 3) {
     fwrite(STDERR, "Usage: php bin/create_admin.php <username>\n");
     exit(1);

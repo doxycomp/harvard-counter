@@ -34,7 +34,9 @@ if (Install::status() !== Install::READY) {
 
 $visitor = Visitor::resolve(Web::stringParam('t'), null);
 
-if ($visitor->isDemo()) {
+// Exporting is for coaches moving their data; a student's link and the demo
+// have no coach to export.
+if ($visitor->coach === null) {
     http_response_code(403);
     echo $view->page('error', [
         'title' => t('export.denied.title'),

@@ -69,15 +69,22 @@ if (!Auth::check()) {
     exit;
 }
 
-$view->share(['adminNav' => true, 'navActive' => 'dashboard']);
+$isAdmin = Auth::isAdmin();
+$scope = Auth::coachScope();
+$view->share(['adminNav' => true, 'navActive' => 'dashboard', 'isAdmin' => $isAdmin]);
 
 echo $view->page('admin/dashboard', [
     'title' => t('admin.dashboard.title'),
     'admin' => Auth::user(),
-    'pending' => Install::pendingMigrations(),
+    'isAdmin' => $isAdmin,
+    'coach' => $scope === null ? null : Contexts::find($scope),
+    // Migrations and collections are an administrator's business.
+    'pending' => $isAdmin ? Install::pendingMigrations() : [],
     'collections' => Install::collectionCount(),
     'items' => Install::itemCount(),
-    'coachCount' => count(Contexts::coaches(false)),
-    'studentCount' => count(Contexts::students()),
-    'totalUses' => (int) Db::fetchValue('SELECT COUNT(*) FROM usage_events WHERE counted = 1'),
+    'coachCount' => $isAdmin ? count(Contexts::coaches(false)) : 1,
+    'studentCount' => $scope === null ? count(Contexts::students()) : Contexts::studentCount($scope),
+    'totalUses' => $scope === null
+        ? (int) Db::fetchValue('SELECT COUNT(*) FROM usage_events WHERE counted = 1')
+        : (int) Db::fetchValue('SELECT COUNT(*) FROM usage_events WHERE counted = 1 AND coach_id = ?', [$scope]),
 ]);

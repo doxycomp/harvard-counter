@@ -24,12 +24,25 @@ use App\Web;
 
 const MAX_USES = 100000;
 
-$coaches = Contexts::coaches(false);
-$students = Contexts::students();
+$scope = AdminPage::coachScope();
+
+// A coach account chooses between its own row and its own students.
+if ($scope === null) {
+    $coaches = Contexts::coaches(false);
+    $students = Contexts::students();
+} else {
+    $own = Contexts::find($scope);
+    $coaches = $own === null ? [] : [$own];
+    $students = Contexts::studentsLinkedTo($scope);
+}
 $collections = Collections::active();
 
 $contextId = AdminPage::id('ctx') ?? AdminPage::id('ctx', $_POST);
 $collectionId = AdminPage::id('c') ?? AdminPage::id('c', $_POST);
+
+if ($contextId !== null && !AdminPage::mayAccessContext($contextId)) {
+    AdminPage::deny($view);
+}
 
 $context = $contextId === null ? null : Contexts::find($contextId);
 $collection = $collectionId === null

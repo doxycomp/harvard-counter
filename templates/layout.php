@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Auth;
 use App\I18n;
 use App\Theme;
 
@@ -71,10 +72,17 @@ $basePath ??= '';
             <?= e(t('appearance.apply')) ?>
         </button>
     </form>
+
+    <?php // Admin pages have their own navigation, so the link is frontend only. ?>
+    <?php if ($basePath === ''): ?>
+        <a class="header-login" href="admin/">
+            <?= e(Auth::check() ? t('nav.admin') : t('nav.login')) ?>
+        </a>
+    <?php endif; ?>
 </header>
 
 <?php if (!empty($adminNav)): ?>
-    <?= $view->render('admin/nav', ['active' => $navActive ?? '']) ?>
+    <?= $view->render('admin/nav', ['active' => $navActive ?? '', 'isAdmin' => $isAdmin ?? false]) ?>
 <?php endif; ?>
 
 <main class="page">

@@ -171,6 +171,110 @@
   --d-band: linear-gradient(90deg, #5bcefa, #f5a9b8, #e8eef2, #f5a9b8, #5bcefa);
 }
 
+/* -------------------------------------------------------------- nonbinary
+ * Flag: yellow #fcf434, white, purple #9c59d1, black #2c2c2c.
+ * Light mode uses a deepened purple for text contrast; dark mode can carry
+ * the flag's yellow as the accent itself. */
+
+:root[data-theme="nonbinary"] {
+  --l-bg: #fcfbf6;
+  --l-surface: #ffffff;
+  --l-sunken: #f3f0f7;
+  --l-fg: #1c1a22;
+  --l-muted: #5c5666;
+  --l-border: #e6e1ec;
+  --l-accent: #7a3fae;
+  --l-accent-fg: #ffffff;
+  --l-accent-soft: #f1e8fa;
+  --l-focus: #7a3fae;
+  --l-danger: #b3261e;
+  --l-success: #1d6f42;
+  --l-band: linear-gradient(90deg, #fcf434, #ffffff, #9c59d1, #2c2c2c);
+
+  --d-bg: #141217;
+  --d-surface: #1e1b23;
+  --d-sunken: #19161e;
+  --d-fg: #f1eef5;
+  --d-muted: #aea6b8;
+  --d-border: #332e3b;
+  --d-accent: #fcf434;
+  --d-accent-fg: #1c1a10;
+  --d-accent-soft: #2e2b16;
+  --d-focus: #fcf434;
+  --d-danger: #ff9b91;
+  --d-success: #6fd39b;
+  --d-band: linear-gradient(90deg, #fcf434, #e8e6ee, #9c59d1, #4a4550);
+}
+
+/* ---------------------------------------------------------------- sapphic
+ * Flag: pink #fd8ba8, white #fbf2ff, violet #c76bc5, with the yellow of the
+ * flower #fdd768. The band puts the violet and yellow in the middle, where
+ * the flower sits. */
+
+:root[data-theme="sapphic"] {
+  --l-bg: #fffafc;
+  --l-surface: #ffffff;
+  --l-sunken: #fbf0f5;
+  --l-fg: #2a1a22;
+  --l-muted: #6e5561;
+  --l-border: #f3dde6;
+  --l-accent: #a3367f;
+  --l-accent-fg: #ffffff;
+  --l-accent-soft: #fbe8f2;
+  --l-focus: #a3367f;
+  --l-danger: #b3261e;
+  --l-success: #1d6f42;
+  --l-band: linear-gradient(90deg, #fd8ba8, #fbf2ff, #c76bc5, #fdd768, #c76bc5, #fbf2ff, #fd8ba8);
+
+  --d-bg: #1a1216;
+  --d-surface: #241a20;
+  --d-sunken: #1f161b;
+  --d-fg: #f7ecf1;
+  --d-muted: #bda6b1;
+  --d-border: #3a2a33;
+  --d-accent: #fd8ba8;
+  --d-accent-fg: #2a0f18;
+  --d-accent-soft: #3a2129;
+  --d-focus: #fd8ba8;
+  --d-danger: #ffa9a2;
+  --d-success: #86d6aa;
+  --d-band: linear-gradient(90deg, #fd8ba8, #e9dcef, #c76bc5, #fdd768, #c76bc5, #e9dcef, #fd8ba8);
+}
+
+/* -------------------------------------------------------------------- ace
+ * Flag: black, grey #a3a3a3, white, purple #800080. On a dark page the black
+ * stripe would vanish, so the dark band lifts it to a dark grey. */
+
+:root[data-theme="ace"] {
+  --l-bg: #fbfbfb;
+  --l-surface: #ffffff;
+  --l-sunken: #f1f1f3;
+  --l-fg: #151515;
+  --l-muted: #555555;
+  --l-border: #dedede;
+  --l-accent: #800080;
+  --l-accent-fg: #ffffff;
+  --l-accent-soft: #f5e6f5;
+  --l-focus: #800080;
+  --l-danger: #b3261e;
+  --l-success: #1d6f42;
+  --l-band: linear-gradient(90deg, #000000, #a3a3a3, #ffffff, #800080);
+
+  --d-bg: #0f0f10;
+  --d-surface: #1a1a1c;
+  --d-sunken: #151517;
+  --d-fg: #efefef;
+  --d-muted: #a9a9ad;
+  --d-border: #333336;
+  --d-accent: #d68fd6;
+  --d-accent-fg: #1a0a1a;
+  --d-accent-soft: #2e1f2e;
+  --d-focus: #d68fd6;
+  --d-danger: #ff9b91;
+  --d-success: #6fd39b;
+  --d-band: linear-gradient(90deg, #4a4a4a, #a3a3a3, #e8e8e8, #a64ca6);
+}
+
 /* ----------------------------------------------------- light / dark wiring
  *
  * Written once for all themes. data-mode="system" (the default) follows the

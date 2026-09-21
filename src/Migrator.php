@@ -15,10 +15,13 @@ final class Migrator
 {
     public function __construct(
         private readonly string $directory = APP_ROOT . '/migrations',
-    ) {
-    }
+    ) {}
 
-    /** Version => absolute path, for every migration file on disk. */
+    /**
+     * Version => absolute path, for every migration file on disk.
+     *
+     * @return array<string, string>
+     */
     public function available(): array
     {
         $files = glob($this->directory . '/*.sql') ?: [];
@@ -32,7 +35,11 @@ final class Migrator
         return $migrations;
     }
 
-    /** Versions already recorded in the database. */
+    /**
+     * Versions already recorded in the database.
+     *
+     * @return list<string>
+     */
     public function applied(): array
     {
         $this->ensureRegistry();
@@ -41,7 +48,11 @@ final class Migrator
         return array_column($rows, 'version');
     }
 
-    /** Versions on disk that have not been applied yet. */
+    /**
+     * Versions on disk that have not been applied yet.
+     *
+     * @return list<string>
+     */
     public function pending(): array
     {
         $applied = $this->applied();
@@ -153,7 +164,7 @@ final class Migrator
 
         return array_values(array_filter(
             array_map(trim(...), $statements),
-            static fn (string $s): bool => $s !== '',
+            static fn(string $s): bool => $s !== '',
         ));
     }
 }

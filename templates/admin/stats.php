@@ -12,6 +12,7 @@ use App\I18n;
  * @var array|null $coach
  * @var array|null $collection
  * @var array|null $data
+ * @var bool       $isAdmin
  * @var array      $messages
  */
 ?>
@@ -23,17 +24,22 @@ use App\I18n;
 
 <section class="card">
     <form method="get" class="inline-form" data-autosubmit>
-        <div class="field">
-            <label for="coach"><?= e(t('coach.name')) ?></label>
-            <select id="coach" name="coach">
-                <?php foreach ($coaches as $option): ?>
-                    <option value="<?= (int) $option['id'] ?>"
-                        <?= (int) ($coach['id'] ?? 0) === (int) $option['id'] ? 'selected' : '' ?>>
-                        <?= e((string) $option['name']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+        <?php if ($isAdmin): ?>
+            <div class="field">
+                <label for="coach"><?= e(t('coach.name')) ?></label>
+                <select id="coach" name="coach">
+                    <option value=""<?= $coach === null ? ' selected' : '' ?>><?= e(t('stats.all')) ?></option>
+                    <?php foreach ($coaches as $option): ?>
+                        <option value="<?= (int) $option['id'] ?>"
+                            <?= (int) ($coach['id'] ?? 0) === (int) $option['id'] ? 'selected' : '' ?>>
+                            <?= e((string) $option['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        <?php else: ?>
+            <p class="muted"><?= e((string) ($coach['name'] ?? '')) ?></p>
+        <?php endif; ?>
 
         <?php if (count($collections) > 1): ?>
             <div class="field">
@@ -129,6 +135,26 @@ use App\I18n;
             </table>
         <?php endif; ?>
     </section>
+
+    <?php if ($data['selfPractice'] !== []): ?>
+        <section class="card">
+            <h2 style="margin-top:0"><?= e(t('stats.self')) ?></h2>
+            <p class="small muted"><?= e(t('stats.self.hint')) ?></p>
+            <table class="data-table">
+                <tbody>
+                <?php foreach ($data['selfPractice'] as $entry): ?>
+                    <tr>
+                        <td><?= e($entry['name']) ?></td>
+                        <td class="numeric"><?= e(I18n::number($entry['uses'])) ?></td>
+                        <td class="numeric muted small">
+                            <?= $entry['last'] === null ? '' : e(I18n::date(new DateTimeImmutable((string) $entry['last']))) ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </section>
+    <?php endif; ?>
 
     <div class="grid-2">
         <section class="card">

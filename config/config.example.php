@@ -29,6 +29,14 @@ return [
      */
     'setup_token' => '',
 
+    /**
+     * Public address of the application, e.g. 'https://counter.example.org/'.
+     * Used to build the full access links coaches receive. Leave empty to
+     * derive it from each request; set it when running behind a reverse proxy
+     * or when links are generated from the command line.
+     */
+    'base_url' => '',
+
     /** Fallback UI language when nothing else matches: en, de or fr. */
     'default_locale' => 'en',
 

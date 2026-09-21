@@ -13,7 +13,7 @@ namespace App;
  */
 final class Collections
 {
-    /** @return array<int, array> active collections in display order */
+    /** @return list<array<string, mixed>> active collections in display order */
     public static function active(): array
     {
         return Db::fetchAll(
@@ -21,17 +21,23 @@ final class Collections
         );
     }
 
+    /** @return array<string, mixed>|null */
     public static function find(int $id): ?array
     {
         return Db::fetchOne('SELECT * FROM collections WHERE id = ?', [$id]);
     }
 
+    /** @return array<string, mixed>|null */
     public static function findBySlug(string $slug): ?array
     {
         return Db::fetchOne('SELECT * FROM collections WHERE slug = ?', [$slug]);
     }
 
-    /** The collection to start from: an explicit slug, the coach's default, or the first one. */
+    /**
+     * The collection to start from: an explicit slug, the coach's default, or the first one.
+     *
+     * @return array<string, mixed>|null
+     */
     public static function choose(?string $slug, ?int $defaultId): ?array
     {
         if ($slug !== null) {
@@ -51,6 +57,7 @@ final class Collections
         return self::active()[0] ?? null;
     }
 
+    /** @return array<string, mixed>|null */
     public static function item(int $collectionId, int $itemNo): ?array
     {
         return Db::fetchOne(
@@ -96,16 +103,19 @@ final class Collections
         );
     }
 
+    /** @param array<string, mixed> $collection */
     public static function name(array $collection, string $locale): string
     {
         return self::localised($collection['names'] ?? null, $locale, (string) $collection['slug']);
     }
 
+    /** @param array<string, mixed> $collection */
     public static function itemLabel(array $collection, string $locale): string
     {
         return self::localised($collection['item_labels'] ?? null, $locale, 'Item');
     }
 
+    /** @param array<string, mixed> $collection */
     public static function description(array $collection, string $locale): ?string
     {
         $value = self::localised($collection['descriptions'] ?? null, $locale, '');

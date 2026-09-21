@@ -13,6 +13,7 @@ declare(strict_types=1);
 require dirname(__DIR__, 2) . '/src/bootstrap.php';
 
 use App\AdminPage;
+use App\Auth;
 use App\ContextImporter;
 use App\Contexts;
 use App\Csrf;
@@ -25,7 +26,12 @@ use App\Web;
 
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 
-$coaches = Contexts::coaches(false);
+$isAdmin = Auth::isAdmin();
+$scope = AdminPage::coachScope();
+
+// A coach account exports itself and nobody else, and does not import:
+// an import creates a coach, which is an administrator's decision.
+$coaches = $scope === null ? Contexts::coaches(false) : array_filter([Contexts::find($scope)]);
 $importError = '';
 $preview = null;
 
@@ -33,8 +39,15 @@ if (Web::isPost()) {
     Csrf::verify();
     $action = Web::stringParam('action', $_POST);
 
+    if (in_array($action, ['preview', 'import'], true) && !$isAdmin) {
+        AdminPage::deny($view);
+    }
+
     if ($action === 'export') {
-        $coachId = AdminPage::id('coach_id', $_POST);
+        $coachId = $scope ?? AdminPage::id('coach_id', $_POST);
+        if ($coachId !== null && !AdminPage::mayAccessCoach($coachId)) {
+            AdminPage::deny($view);
+        }
         $coach = $coachId === null ? null : Contexts::find($coachId);
 
         if ($coach === null || $coach['kind'] !== Contexts::COACH) {
@@ -142,7 +155,8 @@ function readUpload(): string
 echo $view->page('admin/data', [
     'title' => t('admin.nav.data'),
     'messages' => AdminPage::takeFlash(),
-    'coaches' => $coaches,
+    'coaches' => array_values($coaches),
+    'isAdmin' => $isAdmin,
     'preview' => $preview,
     'importError' => $importError,
 ]);

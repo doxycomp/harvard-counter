@@ -6,6 +6,9 @@ return [
     'app.name' => 'Harvard Counter',
     'app.tagline' => 'Practice sentences for voice training',
 
+    'nav.login' => 'Sign in',
+    'nav.admin' => 'Admin',
+
     'appearance.language' => 'Language',
     'appearance.theme' => 'Colour theme',
     'appearance.mode' => 'Appearance',
@@ -19,6 +22,9 @@ return [
     'theme.name.pastel' => 'Pastel',
     'theme.name.mono' => 'Black & white',
     'theme.name.trans' => 'Trans',
+    'theme.name.nonbinary' => 'Non-binary',
+    'theme.name.sapphic' => 'Sapphic',
+    'theme.name.ace' => 'Ace',
 
     'home.title' => 'Practice sentences',
     'home.intro' => 'Ask for a number, get the matching sentences, and see how often they have been used.',
@@ -30,6 +36,7 @@ return [
     'picker.number.hint' => 'Any number from 1 to {max}.',
     'picker.submit' => 'Show sentences',
     'picker.random' => 'Pick one at random',
+    'picker.reset' => 'Start over',
     'picker.error.number' => 'Please enter a number between 1 and {max}.',
     'picker.least_used' => 'Least used ({count}×):',
 
@@ -53,6 +60,11 @@ return [
     'export.link' => 'Export my data',
     'export.denied.title' => 'No access link',
     'export.denied.body' => 'Exporting needs a personal access link. Without one there is nothing stored to export — the demo counters live only in this browser session.',
+
+    'self.notice' => 'Hi {name}! You are practising on your own here — this is counted separately from your lessons.',
+    'result.self_uses' => 'Practised on your own: {count}×',
+    'result.lesson_uses' => 'In lessons: {count}×',
+    'result.self_uses_student' => 'Also practised alone: {count}×',
 
     'error.not_configured.title' => 'Configuration missing',
     'error.not_configured.body' => 'Copy config/config.example.php to config/config.php and fill in the database credentials.',

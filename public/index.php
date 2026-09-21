@@ -15,8 +15,10 @@ require dirname(__DIR__) . '/src/bootstrap.php';
 use App\Collections;
 use App\Contexts;
 use App\Csrf;
+use App\Db;
 use App\Formatter;
 use App\Install;
+use App\SelfCounterStore;
 use App\Session;
 use App\Settings;
 use App\View;
@@ -53,7 +55,7 @@ if (isset($errorPages[$status])) {
 
 // A POST submits to the current URL, so these normally arrive in the query
 // string; the $_POST fallback keeps the page working if a form is ever moved.
-$param = static fn (string $name): ?string
+$param = static fn(string $name): ?string
     => Web::stringParam($name) ?? Web::stringParam($name, $_POST);
 
 $token = $param('t');
@@ -72,7 +74,7 @@ $view->share($vars);
 
 // Keep the token in links only when it arrived in the URL; a visitor who is
 // recognised by cookie should not have it put back into their address bar.
-$carryToken = $token !== null && $visitor->coach !== null ? $token : null;
+$carryToken = $token !== null && !$visitor->isDemo() ? $token : null;
 
 // ------------------------------------------------------------- collection
 
@@ -152,15 +154,12 @@ if (Web::isPost()) {
             if ($item === null) {
                 $formError = t('picker.error.number', ['max' => $itemCount]);
             } else {
-                $handle = $visitor->counters->increment((int) $item['id']);
-                if ($handle !== null) {
-                    Session::set('pending_undo', [
-                        'handle' => $handle,
-                        'item_id' => (int) $item['id'],
-                        'item_no' => $number,
-                        'context_id' => $visitor->selected['id'] ?? 0,
-                    ]);
-                }
+                Session::set('pending_undo', [
+                    'handle' => $visitor->counters->increment((int) $item['id']),
+                    'item_id' => (int) $item['id'],
+                    'item_no' => $number,
+                    'context_id' => $visitor->selected['id'] ?? 0,
+                ]);
                 Session::set('flash', 'counted');
                 Web::redirect($link(['n' => $number]));
             }
@@ -189,6 +188,20 @@ if ($number !== null) {
         $total = $visitor->counters->total($itemId);
         $primary = $visitor->hasStudentSelected() ? $uses : $total;
 
+        // The other half of the picture, shown but never counted from here:
+        // a student practising sees how often it came up in lessons, and a
+        // coach looking at a student sees how often they practised it alone.
+        $lessonUses = null;
+        $selfUses = null;
+        if ($visitor->isSelfPractice()) {
+            $lessonUses = (int) Db::fetchValue(
+                'SELECT uses FROM usage_counts WHERE context_id = ? AND item_id = ?',
+                [(int) $visitor->student['id'], $itemId],
+            );
+        } elseif ($visitor->hasStudentSelected()) {
+            $selfUses = SelfCounterStore::usesFor((int) $visitor->selected['id'], $itemId);
+        }
+
         $template = Formatter::templateFor($visitor->coach, $vars['locale']);
         $discord = Formatter::render(
             $template,
@@ -197,7 +210,9 @@ if ($number !== null) {
                 'count' => $primary,
                 'context' => $visitor->selected['label'] ?? '',
                 'coach' => $visitor->coachName() ?? '',
-                'student' => $visitor->hasStudentSelected() ? $visitor->selected['label'] : '',
+                'student' => $visitor->hasStudentSelected() || $visitor->isSelfPractice()
+                    ? $visitor->selected['label']
+                    : '',
                 'collection' => Collections::name($collection, $vars['locale']),
                 'item_label' => Collections::itemLabel($collection, $vars['locale']),
             ],
@@ -218,6 +233,8 @@ if ($number !== null) {
             'uses' => $uses,
             'total' => $total,
             'primary' => $primary,
+            'lessonUses' => $lessonUses,
+            'selfUses' => $selfUses,
             'discord' => $discord,
             'canUndo' => $canUndo,
         ];
@@ -227,7 +244,11 @@ if ($number !== null) {
 // ------------------------------------------------- counters for the overview
 
 $itemNoMap = Collections::itemNoMap($collectionId);
-$rawCounts = $visitor->counters->allUses(array_keys($itemNoMap));
+// Same level as the headline figure: a student's own counter, or for
+// "Coach (total)" the roll-up over the coach and all their students.
+$rawCounts = $visitor->hasStudentSelected()
+    ? $visitor->counters->allUses(array_keys($itemNoMap))
+    : $visitor->counters->allTotals(array_keys($itemNoMap));
 
 $countsByItemNo = [];
 foreach ($itemNoMap as $id => $no) {

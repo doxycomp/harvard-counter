@@ -56,6 +56,7 @@ final class Db
         }
     }
 
+    /** @param list<mixed> $params */
     public static function query(string $sql, array $params = []): PDOStatement
     {
         $statement = self::pdo()->prepare($sql);
@@ -64,11 +65,19 @@ final class Db
         return $statement;
     }
 
+    /**
+     * @param list<mixed> $params
+     * @return list<array<string, mixed>>
+     */
     public static function fetchAll(string $sql, array $params = []): array
     {
         return self::query($sql, $params)->fetchAll();
     }
 
+    /**
+     * @param list<mixed> $params
+     * @return array<string, mixed>|null
+     */
     public static function fetchOne(string $sql, array $params = []): ?array
     {
         $row = self::query($sql, $params)->fetch();
@@ -76,7 +85,11 @@ final class Db
         return $row === false ? null : $row;
     }
 
-    /** First column of the first row, or null when there is no row. */
+    /**
+     * First column of the first row, or null when there is no row.
+     *
+     * @param list<mixed> $params
+     */
     public static function fetchValue(string $sql, array $params = []): mixed
     {
         $value = self::query($sql, $params)->fetchColumn();
@@ -84,6 +97,7 @@ final class Db
         return $value === false ? null : $value;
     }
 
+    /** @param list<mixed> $params */
     public static function insert(string $sql, array $params = []): int
     {
         self::query($sql, $params);

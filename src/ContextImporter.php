@@ -20,7 +20,11 @@ final class ContextImporter
     /** @var string[] */
     private array $problems = [];
 
-    /** Parse and sanity-check a file without touching the database. */
+    /**
+     * Parse and sanity-check a file without touching the database.
+     *
+     * @return array<string, mixed>
+     */
     public function parse(string $json): array
     {
         $data = json_decode($json, true);
@@ -44,6 +48,7 @@ final class ContextImporter
     /**
      * What an import would do, without doing it.
      *
+     * @param array<string, mixed> $data
      * @return array{coach:string, coach_exists:bool, students:int, students_existing:int,
      *               counts:int, counts_conflicting:int, events:int, unknown_collections:string[]}
      */
@@ -105,6 +110,7 @@ final class ContextImporter
 
     /**
      * @param bool $overwrite replace counters that already hold a value
+     * @param array<string, mixed> $data
      * @return array{coach_id:int, students:int, counts:int, skipped:int, events:int, problems:string[]}
      */
     public function import(array $data, string $coachName, bool $overwrite = false): array
@@ -139,6 +145,9 @@ final class ContextImporter
             }
 
             [$counts, $skipped] = $this->importCounts($data, $contexts, $coachName, $overwrite);
+            [$selfCounts, $selfSkipped] = $this->importCounts($data, $contexts, $coachName, $overwrite, 'self_counts');
+            $counts += $selfCounts;
+            $skipped += $selfSkipped;
             $events = $this->importEvents($data, $contexts, $coachId, $coachName);
 
             return [
@@ -152,6 +161,7 @@ final class ContextImporter
         });
     }
 
+    /** @param array<string, mixed> $data */
     private function createCoach(array $data, string $coachName): int
     {
         $coach = (array) $data['coach'];
@@ -185,15 +195,26 @@ final class ContextImporter
     }
 
     /**
+     * Lesson counters ('counts' into usage_counts) or self-practice
+     * ('self_counts' into self_counts) — same rules for both.
+     *
+     * @param array<string, mixed> $data
      * @param array<string, int> $contexts
+     * @param 'counts'|'self_counts' $key
      * @return array{0:int, 1:int} applied and skipped
      */
-    private function importCounts(array $data, array $contexts, string $coachName, bool $overwrite): array
-    {
+    private function importCounts(
+        array $data,
+        array $contexts,
+        string $coachName,
+        bool $overwrite,
+        string $key = 'counts',
+    ): array {
+        $table = $key === 'self_counts' ? 'self_counts' : 'usage_counts';
         $applied = 0;
         $skipped = 0;
 
-        foreach ((array) ($data['counts'] ?? []) as $row) {
+        foreach ((array) ($data[$key] ?? []) as $row) {
             $itemId = $this->resolveItem($row);
             $contextId = $this->resolveContext($row, $contexts, $coachName);
             $uses = (int) ($row['count'] ?? 0);
@@ -204,7 +225,7 @@ final class ContextImporter
             }
 
             $current = Db::fetchValue(
-                'SELECT uses FROM usage_counts WHERE context_id = ? AND item_id = ?',
+                "SELECT uses FROM {$table} WHERE context_id = ? AND item_id = ?",
                 [$contextId, $itemId],
             );
 
@@ -214,9 +235,9 @@ final class ContextImporter
             }
 
             Db::query(
-                'INSERT INTO usage_counts (context_id, item_id, uses, updated_at)
+                "INSERT INTO {$table} (context_id, item_id, uses, updated_at)
                  VALUES (?, ?, ?, NOW())
-                 ON DUPLICATE KEY UPDATE uses = VALUES(uses), updated_at = NOW()',
+                 ON DUPLICATE KEY UPDATE uses = VALUES(uses), updated_at = NOW()",
                 [$contextId, $itemId, $uses],
             );
             $applied++;
@@ -225,7 +246,10 @@ final class ContextImporter
         return [$applied, $skipped];
     }
 
-    /** @param array<string, int> $contexts */
+    /**
+     * @param array<string, int> $contexts
+     * @param array<string, mixed> $data
+     */
     private function importEvents(array $data, array $contexts, int $coachId, string $coachName): int
     {
         $imported = 0;
@@ -261,6 +285,7 @@ final class ContextImporter
         return $imported;
     }
 
+    /** @param array<string, mixed> $row */
     private function resolveItem(array $row): ?int
     {
         $slug = (string) ($row['collection'] ?? '');
@@ -283,7 +308,10 @@ final class ContextImporter
         return (int) $item['id'];
     }
 
-    /** @param array<string, int> $contexts */
+    /**
+     * @param array<string, int> $contexts
+     * @param array<string, mixed> $row
+     */
     private function resolveContext(array $row, array $contexts, string $coachName): ?int
     {
         $kind = (string) ($row['context_kind'] ?? Contexts::STUDENT);

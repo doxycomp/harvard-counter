@@ -17,7 +17,7 @@ use App\Csrf;
 use App\Db;
 use App\Web;
 
-[$vars, $view] = AdminPage::start('collections');
+[$vars, $view] = AdminPage::start('collections', adminOnly: true);
 
 if (Web::isPost()) {
     Csrf::verify();

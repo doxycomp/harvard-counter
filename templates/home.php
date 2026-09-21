@@ -34,6 +34,12 @@ use App\View;
     </div>
 <?php endif; ?>
 
+<?php if ($visitor->isSelfPractice()): ?>
+    <div class="notice">
+        <p><?= e(t('self.notice', ['name' => (string) $visitor->student['name']])) ?></p>
+    </div>
+<?php endif; ?>
+
 <?php if ($flash === 'not_counted'): ?>
     <div class="notice notice--success">
         <p><?= e(t('result.not_counted')) ?></p>
@@ -65,9 +71,13 @@ use App\View;
     ]) ?>
 <?php endif; ?>
 
-<?= $view->render('partials/overview', [
-    'countsByItemNo' => $countsByItemNo,
-    'itemLabel' => $itemLabel,
-    'number' => $number,
-    'link' => $link,
-]) ?>
+<?php // Only once sentences are on screen, so the overview does not give away
+      // which lists are coming before the student has picked a number. ?>
+<?php if ($result !== null): ?>
+    <?= $view->render('partials/overview', [
+        'countsByItemNo' => $countsByItemNo,
+        'itemLabel' => $itemLabel,
+        'number' => $number,
+        'link' => $link,
+    ]) ?>
+<?php endif; ?>

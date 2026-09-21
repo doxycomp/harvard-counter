@@ -7,32 +7,47 @@ namespace App;
 /**
  * Who is using the frontend, and what their counting is wired to.
  *
- * With a valid access token this is a coach and one selected context row.
- * Without one it is the demo mode: no dropdown, no foreign counters, and
- * numbers that live only in the session.
+ * Three cases:
+ *  - a coach's link: a dropdown of the coach and their students, lesson counters;
+ *  - a student's link: just themselves, self-practice counters;
+ *  - no valid link: the demo, with numbers that live only in the session.
  */
 final class Visitor
 {
     public const COOKIE_TOKEN = 'hc_token';
     public const COOKIE_CONTEXT = 'hc_ctx';
 
+    /**
+     * @param array<string, mixed>|null $coach
+     * @param array<string, mixed>|null $student  set only for a student's own link
+     * @param list<array{id:int, label:string, kind:string}> $selectable
+     * @param array{id:int, label:string, kind:string}|null $selected
+     */
     private function __construct(
         public readonly ?array $coach,
+        public readonly ?array $student,
         public readonly array $selectable,
         public readonly ?array $selected,
         public readonly CounterStore $counters,
-    ) {
-    }
+    ) {}
 
     public function isDemo(): bool
     {
-        return $this->coach === null;
+        return $this->coach === null && $this->student === null;
     }
 
-    /** True when the selected row is a student rather than the coach's own. */
+    /** A student practising through their own link. */
+    public function isSelfPractice(): bool
+    {
+        return $this->student !== null;
+    }
+
+    /** True when a coach has one of their students selected. */
     public function hasStudentSelected(): bool
     {
-        return $this->selected !== null && $this->selected['kind'] === Contexts::STUDENT;
+        return $this->coach !== null
+            && $this->selected !== null
+            && $this->selected['kind'] === Contexts::STUDENT;
     }
 
     public function coachName(): ?string
@@ -46,26 +61,37 @@ final class Visitor
      */
     public static function resolve(?string $token, ?int $contextId): self
     {
-        $coach = self::resolveCoach($token);
+        $context = self::resolveContext($token);
 
-        if ($coach === null) {
-            return new self(null, [], null, new SessionCounterStore());
+        if ($context === null) {
+            return new self(null, null, [], null, new SessionCounterStore());
         }
 
-        $selectable = Contexts::selectableFor($coach);
+        if ($context['kind'] === Contexts::STUDENT) {
+            $self = [
+                'id' => (int) $context['id'],
+                'label' => (string) $context['name'],
+                'kind' => Contexts::STUDENT,
+            ];
+
+            return new self(null, $context, [], $self, new SelfCounterStore((int) $context['id']));
+        }
+
+        $selectable = Contexts::selectableFor($context);
         $selected = self::pickSelected($selectable, $contextId);
 
         // Remember the choice so the next visit opens where they left off.
         Session::setPreference(self::COOKIE_CONTEXT, (string) $selected['id']);
 
         return new self(
-            $coach,
+            $context,
+            null,
             $selectable,
             $selected,
             new DbCounterStore(
-                (int) $coach['id'],
+                (int) $context['id'],
                 $selected['id'],
-                Contexts::rollupIds((int) $coach['id']),
+                Contexts::rollupIds((int) $context['id']),
             ),
         );
     }
@@ -73,16 +99,18 @@ final class Visitor
     /**
      * The token may come from the link or from the cookie a previous visit
      * left behind. The link stays in the URL on purpose: it is the credential,
-     * and coaches bookmark it.
+     * and people bookmark it.
+     *
+     * @return array<string, mixed>|null
      */
-    private static function resolveCoach(?string $token): ?array
+    private static function resolveContext(?string $token): ?array
     {
         if ($token !== null) {
-            $coach = Contexts::findCoachByToken($token);
-            if ($coach !== null) {
+            $context = Contexts::findByToken($token);
+            if ($context !== null) {
                 Session::setPreference(self::COOKIE_TOKEN, $token);
 
-                return $coach;
+                return $context;
             }
 
             // An invalid token is treated as no token: demo mode, no error
@@ -92,10 +120,13 @@ final class Visitor
 
         $cookie = $_COOKIE[self::COOKIE_TOKEN] ?? null;
 
-        return is_string($cookie) ? Contexts::findCoachByToken($cookie) : null;
+        return is_string($cookie) ? Contexts::findByToken($cookie) : null;
     }
 
-    /** @param array<int, array{id:int, label:string, kind:string}> $selectable */
+    /**
+     * @param list<array{id:int, label:string, kind:string}> $selectable
+     * @return array{id:int, label:string, kind:string}
+     */
     private static function pickSelected(array $selectable, ?int $requested): array
     {
         $byId = [];

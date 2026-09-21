@@ -22,6 +22,7 @@ final class Exporter
      * @param bool $includeEvents the session history, off by default — the
      *                            counters are what a move needs, and the
      *                            timestamps should not travel by accident
+     * @return array<string, mixed>
      */
     public static function exportCoach(int $coachId, bool $includeEvents = false): array
     {
@@ -62,11 +63,18 @@ final class Exporter
                     'codeblock_lang' => (string) ($coach['fmt_codeblock_lang'] ?? ''),
                 ],
             ],
-            'students' => array_map(static fn (array $s): array => [
+            'students' => array_map(static fn(array $s): array => [
                 'name' => (string) $s['name'],
                 'display_name' => $s['label'] === $s['name'] ? null : (string) $s['label'],
             ], $students),
             'counts' => self::counts(array_keys($contexts), $contexts),
+            // Self-practice of the coach's students, kept apart like it is in
+            // the database.
+            'self_counts' => self::counts(
+                array_keys(array_filter($contexts, static fn(array $c): bool => $c['kind'] === Contexts::STUDENT)),
+                $contexts,
+                'self_counts',
+            ),
             'note' => 'Student counters are shared with that student\'s other coaches, '
                 . 'so these figures may include sessions taught by someone else.',
         ];
@@ -78,8 +86,13 @@ final class Exporter
         return $export;
     }
 
-    /** @param array<int, array{name:string, kind:string}> $contexts */
-    private static function counts(array $contextIds, array $contexts): array
+    /**
+     * @param list<int> $contextIds
+     * @param array<int, array{name:string, kind:string}> $contexts
+     * @param 'usage_counts'|'self_counts' $table
+     * @return list<array{collection:string, item_no:int, context:string, context_kind:string, count:int}>
+     */
+    private static function counts(array $contextIds, array $contexts, string $table = 'usage_counts'): array
     {
         if ($contextIds === []) {
             return [];
@@ -88,7 +101,7 @@ final class Exporter
         $placeholders = implode(',', array_fill(0, count($contextIds), '?'));
         $rows = Db::fetchAll(
             "SELECT uc.context_id, uc.uses, ci.item_no, c.slug
-             FROM usage_counts uc
+             FROM {$table} uc
              JOIN collection_items ci ON ci.id = uc.item_id
              JOIN collections c ON c.id = ci.collection_id
              WHERE uc.context_id IN ({$placeholders}) AND uc.uses > 0
@@ -96,7 +109,7 @@ final class Exporter
             $contextIds,
         );
 
-        return array_map(static fn (array $row): array => [
+        return array_map(static fn(array $row): array => [
             'collection' => (string) $row['slug'],
             'item_no' => (int) $row['item_no'],
             'context' => $contexts[(int) $row['context_id']]['name'],
@@ -105,7 +118,12 @@ final class Exporter
         ], $rows);
     }
 
-    /** Only this coach's own sessions, never another coach's. */
+    /**
+     * Only this coach's own sessions, never another coach's.
+     *
+     * @param array<int, array{name:string, kind:string}> $contexts
+     * @return list<array<string, mixed>>
+     */
     private static function events(int $coachId, array $contexts): array
     {
         $rows = Db::fetchAll(
@@ -137,6 +155,7 @@ final class Exporter
         return $events;
     }
 
+    /** @param array<string, mixed> $export */
     public static function toJson(array $export): string
     {
         return json_encode(
@@ -145,7 +164,11 @@ final class Exporter
         );
     }
 
-    /** One row per context and item, for a spreadsheet. */
+    /**
+     * One row per context and item, for a spreadsheet.
+     *
+     * @param array<string, mixed> $export
+     */
     public static function toCsv(array $export): string
     {
         $handle = fopen('php://temp', 'r+b');

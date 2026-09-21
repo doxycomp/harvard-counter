@@ -91,10 +91,12 @@ $showContextPicker = !$visitor->isDemo() && count($visitor->selectable) > 0;
                     'label' => $itemLabel,
                     'max' => $itemCount,
                 ])) ?></p>
+                <?php // Inside the field, so it does not become a cell of its own in the grid. ?>
+                <?php if ($formError !== ''): ?>
+                    <p class="field__hint field__hint--error"><?= e($formError) ?></p>
+                <?php endif; ?>
             </div>
-        <?php endif; ?>
-
-        <?php if ($formError !== ''): ?>
+        <?php elseif ($formError !== ''): ?>
             <p class="field__hint field__hint--error"><?= e($formError) ?></p>
         <?php endif; ?>
 
@@ -103,6 +105,10 @@ $showContextPicker = !$visitor->isDemo() && count($visitor->selectable) > 0;
             <button type="submit" name="random" value="1" class="button--quiet">
                 <?= e(t('picker.random')) ?>
             </button>
+            <?php if ($number !== null || $formError !== ''): ?>
+                <?php // Back to the empty picker; coach, context and collection stay. ?>
+                <a class="button button--quiet" href="<?= e($link()) ?>"><?= e(t('picker.reset')) ?></a>
+            <?php endif; ?>
         </div>
     </form>
 
@@ -115,7 +121,7 @@ $showContextPicker = !$visitor->isDemo() && count($visitor->selectable) > 0;
         </p>
     <?php endif; ?>
 
-    <?php if (!$visitor->isDemo()): ?>
+    <?php if ($visitor->coach !== null): ?>
         <p class="small muted picker-hint">
             <a href="export.php<?= $carryToken === null ? '' : '?t=' . e($carryToken) ?>">
                 <?= e(t('export.link')) ?>

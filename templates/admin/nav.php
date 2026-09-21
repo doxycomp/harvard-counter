@@ -4,17 +4,34 @@ declare(strict_types=1);
 
 use App\Csrf;
 
-/** @var string $active */
-$items = [
-    'dashboard' => ['index.php', 'admin.nav.overview'],
-    'coaches' => ['coaches.php', 'admin.nav.coaches'],
-    'students' => ['students.php', 'admin.nav.students'],
-    'counters' => ['counters.php', 'admin.nav.counters'],
-    'stats' => ['stats.php', 'admin.nav.stats'],
-    'collections' => ['collections.php', 'admin.nav.collections'],
-    'data' => ['data.php', 'admin.nav.data'],
-    'account' => ['account.php', 'admin.nav.account'],
-];
+/**
+ * Navigation differs by role. This is presentation only — every page checks
+ * the role and the scope itself.
+ *
+ * @var string $active
+ * @var bool   $isAdmin
+ */
+$items = $isAdmin
+    ? [
+        'dashboard' => ['index.php', 'admin.nav.overview'],
+        'coaches' => ['coaches.php', 'admin.nav.coaches'],
+        'students' => ['students.php', 'admin.nav.students'],
+        'counters' => ['counters.php', 'admin.nav.counters'],
+        'stats' => ['stats.php', 'admin.nav.stats'],
+        'collections' => ['collections.php', 'admin.nav.collections'],
+        'data' => ['data.php', 'admin.nav.data'],
+        // An administrator reaches their own password through the users page.
+        'users' => ['users.php', 'admin.nav.users'],
+    ]
+    : [
+        'dashboard' => ['index.php', 'admin.nav.overview'],
+        'coaches' => ['coaches.php', 'admin.nav.profile'],
+        'students' => ['students.php', 'admin.nav.students'],
+        'counters' => ['counters.php', 'admin.nav.counters'],
+        'stats' => ['stats.php', 'admin.nav.stats'],
+        'data' => ['data.php', 'admin.nav.export'],
+        'account' => ['account.php', 'admin.nav.account'],
+    ];
 ?>
 <nav class="admin-nav" aria-label="<?= e(t('admin.title')) ?>">
     <div class="admin-nav__inner">

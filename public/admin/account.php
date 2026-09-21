@@ -13,6 +13,11 @@ use App\Web;
 
 [$vars, $view] = AdminPage::start('account');
 
+// Administrators reach this page from the users page, which stays highlighted.
+if (Auth::isAdmin()) {
+    $view->share(['navActive' => 'users']);
+}
+
 $formError = '';
 
 if (Web::isPost()) {

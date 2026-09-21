@@ -7,7 +7,7 @@ declare(strict_types=1);
  * Check every colour theme against WCAG AA.
  *
  * The themes are the one place where a well-meant palette can quietly make
- * text unreadable, and there are five of them in two modes each — too many
+ * text unreadable, and every theme comes in two modes — far too many
  * combinations to judge by eye. This computes the contrast ratios instead.
  *
  * Usage: php bin/check_contrast.php [--verbose]
@@ -83,7 +83,7 @@ function luminance(string $hex): float
     }
 
     [$r, $g, $b] = array_map(
-        static fn (string $part): float => channel(hexdec($part) / 255),
+        static fn(string $part): float => channel(hexdec($part) / 255),
         str_split(substr($hex, 0, 6), 2),
     );
 
@@ -99,7 +99,7 @@ function ratio(string $a, string $b): float
     return ($light + 0.05) / ($dark + 0.05);
 }
 
-$verbose = in_array('--verbose', $argv, true);
+$verbose = in_array('--verbose', $_SERVER['argv'], true);
 $themes = parseThemes($css);
 $failures = 0;
 $checked = 0;

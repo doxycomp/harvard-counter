@@ -23,8 +23,7 @@ final class DbCounterStore implements CounterStore
         private readonly int $coachId,
         private readonly int $contextId,
         private readonly array $rollupIds,
-    ) {
-    }
+    ) {}
 
     public function uses(int $itemId): int
     {
@@ -70,7 +69,30 @@ final class DbCounterStore implements CounterStore
         return $counts;
     }
 
-    public function increment(int $itemId): ?string
+    public function allTotals(array $itemIds): array
+    {
+        if ($itemIds === [] || $this->rollupIds === []) {
+            return [];
+        }
+
+        $items = implode(',', array_fill(0, count($itemIds), '?'));
+        $contexts = implode(',', array_fill(0, count($this->rollupIds), '?'));
+        $rows = Db::fetchAll(
+            "SELECT item_id, SUM(uses) AS total FROM usage_counts
+             WHERE context_id IN ({$contexts}) AND item_id IN ({$items})
+             GROUP BY item_id",
+            [...$this->rollupIds, ...$itemIds],
+        );
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int) $row['item_id']] = (int) $row['total'];
+        }
+
+        return $counts;
+    }
+
+    public function increment(int $itemId): string
     {
         return Db::transaction(function () use ($itemId): string {
             Db::query(

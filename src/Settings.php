@@ -10,6 +10,7 @@ namespace App;
  */
 final class Settings
 {
+    /** @var array<string, string|null>|null */
     private static ?array $cache = null;
 
     public static function get(string $key, ?string $default = null): ?string
@@ -31,7 +32,11 @@ final class Settings
         self::$cache[$key] = $value;
     }
 
-    /** All settings whose key starts with $prefix, keyed without the prefix. */
+    /**
+     * All settings whose key starts with $prefix, keyed without the prefix.
+     *
+     * @return array<string, string|null>
+     */
     public static function withPrefix(string $prefix): array
     {
         self::load();
@@ -46,10 +51,14 @@ final class Settings
         return $result;
     }
 
-    /** The default Discord template for a locale, falling back to English. */
+    /**
+     * The default Discord template for a locale, falling back to English.
+     *
+     * @return array{header:string, line:string, footer:string}
+     */
     public static function defaultFormat(string $locale): array
     {
-        $pick = static fn (string $part): string => (string) (
+        $pick = static fn(string $part): string => (string) (
             self::get("fmt.default.{$locale}.{$part}")
             ?? self::get("fmt.default.en.{$part}")
             ?? ''

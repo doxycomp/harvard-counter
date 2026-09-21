@@ -9,32 +9,38 @@ use DateTimeImmutable;
 /**
  * Statistics for the admin area.
  *
- * Everything here reads usage_events rather than usage_counts, because the
- * event log is the part that stays attributed to the teaching coach. The
- * counter itself is shared between a student's coaches, so it cannot answer
- * "how much of this was mine".
+ * Everything here reads usage_events rather than usage_counts where it can,
+ * because the event log is the part that stays attributed to the teaching
+ * coach. The counter itself is shared between a student's coaches, so it
+ * cannot answer "how much of this was mine".
+ *
+ * Every method takes a coach id or null; null means across all coaches.
  */
 final class Stats
 {
     /**
      * @return array{total:int, undone:int, last:?string, students:int}
      */
-    public static function summaryForCoach(int $coachId): array
+    public static function summaryForCoach(?int $coachId): array
     {
+        [$where, $params] = self::coachFilter($coachId);
+
         $row = Db::fetchOne(
-            'SELECT
+            "SELECT
                 COALESCE(SUM(counted = 1), 0) AS total,
                 COALESCE(SUM(counted = 0), 0) AS undone,
                 MAX(CASE WHEN counted = 1 THEN created_at END) AS last_used
-             FROM usage_events WHERE coach_id = ?',
-            [$coachId],
+             FROM usage_events WHERE {$where}",
+            $params,
         );
 
         return [
             'total' => (int) ($row['total'] ?? 0),
             'undone' => (int) ($row['undone'] ?? 0),
             'last' => $row['last_used'] ?? null,
-            'students' => Contexts::studentCount($coachId),
+            'students' => $coachId === null
+                ? count(Contexts::students())
+                : Contexts::studentCount($coachId),
         ];
     }
 
@@ -44,7 +50,7 @@ final class Stats
      *
      * @return array<string, int> 'YYYY-MM' => count
      */
-    public static function monthly(int $coachId, int $months = 12): array
+    public static function monthly(?int $coachId, int $months = 12): array
     {
         $buckets = [];
         $cursor = new DateTimeImmutable('first day of this month 00:00:00');
@@ -52,13 +58,15 @@ final class Stats
             $buckets[$cursor->modify("-{$i} months")->format('Y-m')] = 0;
         }
 
+        [$where, $params] = self::coachFilter($coachId);
+
         $rows = Db::fetchAll(
             "SELECT DATE_FORMAT(created_at, '%Y-%m') AS bucket, COUNT(*) AS uses
              FROM usage_events
-             WHERE coach_id = ? AND counted = 1
+             WHERE {$where} AND counted = 1
                AND created_at >= DATE_SUB(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL ? MONTH)
              GROUP BY bucket",
-            [$coachId, $months - 1],
+            [...$params, $months - 1],
         );
 
         foreach ($rows as $row) {
@@ -71,23 +79,25 @@ final class Stats
     }
 
     /**
-     * How the coach's own sessions split across their students.
+     * How sessions split across students (and coaches' own rows).
      *
-     * @return array<int, array{name:string, uses:int}>
+     * @return array<int, array{name:string, kind:string, uses:int}>
      */
-    public static function byStudent(int $coachId): array
+    public static function byStudent(?int $coachId): array
     {
+        [$where, $params] = self::coachFilter($coachId, 'e.');
+
         $rows = Db::fetchAll(
-            'SELECT e.context_id, c.name, c.kind, COUNT(*) AS uses
+            "SELECT e.context_id, c.name, c.kind, COUNT(*) AS uses
              FROM usage_events e
              JOIN contexts c ON c.id = e.context_id
-             WHERE e.coach_id = ? AND e.counted = 1
+             WHERE {$where} AND e.counted = 1
              GROUP BY e.context_id, c.name, c.kind
-             ORDER BY uses DESC, c.name',
-            [$coachId],
+             ORDER BY uses DESC, c.name",
+            $params,
         );
 
-        return array_map(static fn (array $row): array => [
+        return array_map(static fn(array $row): array => [
             'name' => (string) $row['name'],
             'kind' => (string) $row['kind'],
             'uses' => (int) $row['uses'],
@@ -95,29 +105,68 @@ final class Stats
     }
 
     /**
-     * Item counters for a coach, rolled up over their own row and students,
-     * with unused items included as zero.
+     * Self-practice per student, kept apart from the lesson figures above.
+     * For a coach: their students; for null: every student.
+     *
+     * @return list<array{name:string, uses:int, last:?string}>
+     */
+    public static function selfPractice(?int $coachId): array
+    {
+        $join = $coachId === null ? '' : 'JOIN context_links l ON l.student_id = c.id AND l.coach_id = ?';
+        $params = $coachId === null ? [] : [$coachId];
+
+        $rows = Db::fetchAll(
+            "SELECT c.name, COUNT(*) AS uses, MAX(s.created_at) AS last_used
+             FROM self_events s
+             JOIN contexts c ON c.id = s.context_id
+             {$join}
+             WHERE s.counted = 1
+             GROUP BY c.id, c.name
+             ORDER BY uses DESC, c.name",
+            $params,
+        );
+
+        return array_map(static fn(array $row): array => [
+            'name' => (string) $row['name'],
+            'uses' => (int) $row['uses'],
+            'last' => $row['last_used'] ?? null,
+        ], $rows);
+    }
+
+    /**
+     * Item counters rolled up over a coach's own row and students — or, for
+     * null, over every context there is — with unused items included as zero.
+     *
+     * Summing every row does not double count: each use increments exactly
+     * one row, and a shared student's row exists once, not once per coach.
      *
      * @return array<int, int> item_no => uses
      */
-    public static function itemCounts(int $coachId, int $collectionId): array
+    public static function itemCounts(?int $coachId, int $collectionId): array
     {
         $itemNoMap = Collections::itemNoMap($collectionId);
         if ($itemNoMap === []) {
             return [];
         }
 
-        $rollup = Contexts::rollupIds($coachId);
-        $ctxPlaceholders = implode(',', array_fill(0, count($rollup), '?'));
         $itemIds = array_keys($itemNoMap);
         $itemPlaceholders = implode(',', array_fill(0, count($itemIds), '?'));
+
+        if ($coachId === null) {
+            $contextClause = '';
+            $contextParams = [];
+        } else {
+            $rollup = Contexts::rollupIds($coachId);
+            $contextClause = 'context_id IN (' . implode(',', array_fill(0, count($rollup), '?')) . ') AND ';
+            $contextParams = $rollup;
+        }
 
         $sums = [];
         foreach (Db::fetchAll(
             "SELECT item_id, SUM(uses) AS total FROM usage_counts
-             WHERE context_id IN ({$ctxPlaceholders}) AND item_id IN ({$itemPlaceholders})
+             WHERE {$contextClause}item_id IN ({$itemPlaceholders})
              GROUP BY item_id",
-            [...$rollup, ...$itemIds],
+            [...$contextParams, ...$itemIds],
         ) as $row) {
             $sums[(int) $row['item_id']] = (int) $row['total'];
         }
@@ -152,5 +201,13 @@ final class Stats
         });
 
         return array_slice($sorted, 0, $limit, true);
+    }
+
+    /** @return array{0:string, 1:list<int>} a WHERE fragment and its parameters */
+    private static function coachFilter(?int $coachId, string $prefix = ''): array
+    {
+        return $coachId === null
+            ? ['1 = 1', []]
+            : ["{$prefix}coach_id = ?", [$coachId]];
     }
 }

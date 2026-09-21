@@ -21,7 +21,11 @@ $blockId = 'discord-block';
     </h2>
 
     <p class="result__counts">
-        <?php if ($visitor->hasStudentSelected()): ?>
+        <?php if ($visitor->isSelfPractice()): ?>
+            <strong><?= e(t('result.self_uses', ['count' => $result['primary']])) ?></strong>
+            <span class="muted">·</span>
+            <span class="muted"><?= e(t('result.lesson_uses', ['count' => (int) $result['lessonUses']])) ?></span>
+        <?php elseif ($visitor->hasStudentSelected()): ?>
             <strong><?= e(t('result.uses_for', [
                 'name' => $visitor->selected['label'],
                 'count' => $result['uses'],
@@ -37,6 +41,10 @@ $blockId = 'discord-block';
             <strong><?= e(tn('result.uses', (int) $result['primary'])) ?></strong>
         <?php endif; ?>
     </p>
+
+    <?php if (($result['selfUses'] ?? 0) > 0): ?>
+        <p class="small muted"><?= e(t('result.self_uses_student', ['count' => (int) $result['selfUses']])) ?></p>
+    <?php endif; ?>
 
     <?php if ($studentCoachCount > 1): ?>
         <p class="small muted"><?= e(t('result.shared_counter')) ?></p>
