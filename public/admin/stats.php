@@ -38,6 +38,19 @@ $collection = $collectionId === null
     ? ($collections[0] ?? null)
     : (Collections::find($collectionId) ?? ($collections[0] ?? null));
 
+// One student's self-practice per list. Checked like every other id: a coach
+// account only gets its own students, whatever the request names.
+$student = null;
+$studentId = AdminPage::id('student');
+if ($studentId !== null) {
+    $student = Contexts::find($studentId);
+    if ($student === null || $student['kind'] !== Contexts::STUDENT) {
+        $student = null;
+    } elseif (!AdminPage::mayAccessContext($studentId)) {
+        AdminPage::deny($view);
+    }
+}
+
 $data = null;
 
 if ($coaches !== [] && $collection !== null) {
@@ -53,6 +66,11 @@ if ($coaches !== [] && $collection !== null) {
         'top' => Stats::extremes($counts, 10, false),
         'bottom' => Stats::extremes($counts, 10, true),
         'itemLabel' => Collections::itemLabel($collection, $vars['locale']),
+        'breakdown' => $student === null ? null : [
+            'student' => $student,
+            'rows' => Stats::selfBreakdown((int) $student['id'], (int) $collection['id']),
+            'itemCount' => count(Collections::itemNoMap((int) $collection['id'])),
+        ],
     ];
 }
 
@@ -64,5 +82,6 @@ echo $view->page('admin/stats', [
     'collections' => $collections,
     'coach' => $coach,
     'collection' => $collection,
+    'student' => $student,
     'data' => $data,
 ]);

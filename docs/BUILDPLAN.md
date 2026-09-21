@@ -361,8 +361,10 @@ Rules the themes must follow:
 So a coach can fork the repository and keep running it on their own server
 without starting from zero.
 
-**Export** — reachable in the frontend through the coach's own token link
-("Export my data") and in the admin area for any or all coaches:
+**Export** — in the admin area: an administrator exports any or all coaches, a
+coach account its own data. (Early versions also offered it on the frontend
+through the coach's token link; that was dropped, since a link that is pasted
+into Discord should not also be the key to a full data dump.)
 
 * **JSON** (machine readable, re-importable): coach, students, Discord
   templates, locale, theme, default collection and all counters.
@@ -490,6 +492,13 @@ used", the coach totals and every lesson statistic are untouched by
 construction. A student sees their self-practice figure with the lesson figure
 beside it; a coach sees a student's self-practice beside their lesson figure
 and in the statistics. Student links are revocable; coach links only rotate.
+
+The statistics list self-practice per student; a click on a name breaks it
+down per list of the selected collection: how often alone, how often in
+lessons, and when last practised alone, plus how many lists were covered
+alone. Lists that came up neither way are left out rather than shown as a
+column of zeros. The student id is checked like every other id, so a coach
+account only opens its own students.
 
 Student links use `?s=`, coach links keep `?t=` (they predate student links and
 are already out in Discord messages). Each parameter resolves only its own

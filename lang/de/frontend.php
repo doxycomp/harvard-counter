@@ -57,7 +57,6 @@ return [
 
     'demo.notice' => 'Die Zähler gelten nur für diese Sitzung. Einen persönlichen Link zum Speichern gibt es im Discord.',
 
-    'export.link' => 'Meine Daten exportieren',
     'export.denied.title' => 'Kein Zugangslink',
     'export.denied.body' => 'Für den Export braucht es einen persönlichen Zugangslink. Ohne ihn gibt es nichts zu exportieren — die Demo-Zähler leben nur in dieser Browser-Sitzung.',
 

@@ -11,6 +11,7 @@ use App\I18n;
  * @var array      $collections
  * @var array|null $coach
  * @var array|null $collection
+ * @var array|null $student     whose self-practice is broken down per list
  * @var array|null $data
  * @var bool       $isAdmin
  * @var array      $messages
@@ -53,6 +54,10 @@ use App\I18n;
                     <?php endforeach; ?>
                 </select>
             </div>
+        <?php endif; ?>
+
+        <?php if ($student !== null): ?>
+            <input type="hidden" name="student" value="<?= (int) $student['id'] ?>">
         <?php endif; ?>
 
         <div class="button-row">
@@ -136,6 +141,15 @@ use App\I18n;
         <?php endif; ?>
     </section>
 
+    <?php
+    // Links keep the coach and collection selected; only the student changes.
+    $statsLink = static fn(?int $studentId): string => 'stats.php?' . http_build_query(array_filter([
+        'coach' => $isAdmin && $coach !== null ? (int) $coach['id'] : null,
+        'c' => $collection !== null ? (int) $collection['id'] : null,
+        'student' => $studentId,
+    ], static fn($value): bool => $value !== null));
+    ?>
+
     <?php if ($data['selfPractice'] !== []): ?>
         <section class="card">
             <h2 style="margin-top:0"><?= e(t('stats.self')) ?></h2>
@@ -143,8 +157,13 @@ use App\I18n;
             <table class="data-table">
                 <tbody>
                 <?php foreach ($data['selfPractice'] as $entry): ?>
-                    <tr>
-                        <td><?= e($entry['name']) ?></td>
+                    <tr<?= (int) ($student['id'] ?? 0) === $entry['id'] ? ' class="is-selected"' : '' ?>>
+                        <td>
+                            <a href="<?= e($statsLink($entry['id'])) ?>#self-detail"
+                               title="<?= e(t('stats.self.show', ['name' => $entry['name']])) ?>">
+                                <?= e($entry['name']) ?>
+                            </a>
+                        </td>
                         <td class="numeric"><?= e(I18n::number($entry['uses'])) ?></td>
                         <td class="numeric muted small">
                             <?= $entry['last'] === null ? '' : e(I18n::date(new DateTimeImmutable((string) $entry['last']))) ?>
@@ -153,6 +172,56 @@ use App\I18n;
                 <?php endforeach; ?>
                 </tbody>
             </table>
+        </section>
+    <?php endif; ?>
+
+    <?php if ($data['breakdown'] !== null): ?>
+        <?php
+        $rows = $data['breakdown']['rows'];
+        $practised = count(array_filter($rows, static fn(array $row): bool => $row['self'] > 0));
+        ?>
+        <section class="card" id="self-detail">
+            <h2 style="margin-top:0">
+                <?= e(t('stats.self.detail', ['name' => (string) $data['breakdown']['student']['name']])) ?>
+            </h2>
+            <p><?= e(t('stats.self.coverage', [
+                'count' => I18n::number($practised),
+                'total' => I18n::number($data['breakdown']['itemCount']),
+            ])) ?></p>
+
+            <?php if ($rows === []): ?>
+                <p class="muted"><?= e(t('stats.nothing_yet')) ?></p>
+            <?php else: ?>
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th><?= e($data['itemLabel']) ?></th>
+                        <th class="numeric"><?= e(t('stats.self.col_self')) ?></th>
+                        <th class="numeric"><?= e(t('stats.self.col_lesson')) ?></th>
+                        <th class="numeric"><?= e(t('stats.self.col_last')) ?></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($rows as $row): ?>
+                        <tr>
+                            <td data-label="<?= e($data['itemLabel']) ?>"><?= (int) $row['item_no'] ?></td>
+                            <td class="numeric" data-label="<?= e(t('stats.self.col_self')) ?>">
+                                <?= $row['self'] > 0 ? (int) $row['self'] . '×' : '<span class="muted">–</span>' ?>
+                            </td>
+                            <td class="numeric" data-label="<?= e(t('stats.self.col_lesson')) ?>">
+                                <?= $row['lesson'] > 0 ? (int) $row['lesson'] . '×' : '<span class="muted">–</span>' ?>
+                            </td>
+                            <td class="numeric muted small" data-label="<?= e(t('stats.self.col_last')) ?>">
+                                <?= $row['last'] === null ? '' : e(I18n::date(new DateTimeImmutable($row['last']))) ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+
+            <p class="small muted"><?= e(t('stats.self.detail.hint')) ?></p>
+            <p class="small"><a href="<?= e($statsLink(null)) ?>"><?= e(t('stats.self.close')) ?></a></p>
         </section>
     <?php endif; ?>
 
