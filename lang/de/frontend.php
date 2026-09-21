@@ -6,6 +6,9 @@ return [
     'app.name' => 'Harvard Counter',
     'app.tagline' => 'Übungssätze fürs Voicetraining',
 
+    'nav.login' => 'Anmelden',
+    'nav.admin' => 'Verwaltung',
+
     'appearance.language' => 'Sprache',
     'appearance.theme' => 'Farbthema',
     'appearance.mode' => 'Darstellung',
@@ -19,6 +22,9 @@ return [
     'theme.name.pastel' => 'Pastell',
     'theme.name.mono' => 'Schwarz-Weiß',
     'theme.name.trans' => 'Trans',
+    'theme.name.nonbinary' => 'Nichtbinär',
+    'theme.name.sapphic' => 'Sapphic',
+    'theme.name.ace' => 'Ace',
 
     'home.title' => 'Übungssätze',
     'home.intro' => 'Nach einer Zahl fragen, die passenden Sätze erhalten und sehen, wie oft sie schon genutzt wurden.',
@@ -30,6 +36,7 @@ return [
     'picker.number.hint' => 'Eine beliebige Zahl von 1 bis {max}.',
     'picker.submit' => 'Sätze anzeigen',
     'picker.random' => 'Zufällig auswählen',
+    'picker.reset' => 'Zurücksetzen',
     'picker.error.number' => 'Bitte eine Zahl zwischen 1 und {max} eingeben.',
     'picker.least_used' => 'Am seltensten genutzt ({count}×):',
 
@@ -53,6 +60,11 @@ return [
     'export.link' => 'Meine Daten exportieren',
     'export.denied.title' => 'Kein Zugangslink',
     'export.denied.body' => 'Für den Export braucht es einen persönlichen Zugangslink. Ohne ihn gibt es nichts zu exportieren — die Demo-Zähler leben nur in dieser Browser-Sitzung.',
+
+    'self.notice' => 'Hallo {name}! Du übst hier selbst — das wird getrennt vom Unterricht gezählt.',
+    'result.self_uses' => 'Selbst geübt: {count}×',
+    'result.lesson_uses' => 'Im Unterricht: {count}×',
+    'result.self_uses_student' => 'Außerdem selbst geübt: {count}×',
 
     'error.not_configured.title' => 'Konfiguration fehlt',
     'error.not_configured.body' => 'Kopiere config/config.example.php nach config/config.php und trage die Datenbank-Zugangsdaten ein.',

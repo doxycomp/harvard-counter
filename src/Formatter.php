@@ -59,6 +59,7 @@ final class Formatter
     /**
      * The template to use: the coach's own, else the per-locale default.
      *
+     * @param array<string, mixed>|null $coach
      * @return array{header:string, line:string, footer:string, codeblock:bool, codeblock_lang:string}
      */
     public static function templateFor(?array $coach, string $locale): array
@@ -133,6 +134,8 @@ final class Formatter
     /**
      * True when the template mixes Discord markdown with a code block, where
      * the markdown would be shown literally instead of rendered.
+     *
+     * @param array{header:string, line:string, footer:string, codeblock:bool, codeblock_lang:string} $template
      */
     public static function markdownInCodeblock(array $template): bool
     {
@@ -145,7 +148,10 @@ final class Formatter
         return preg_match('/\*\*|__|~~|^\s*>|\*(?=\S)/m', $text) === 1;
     }
 
-    /** @param array<string, string|int> $vars */
+    /**
+     * @param array<string, string|int> $vars
+     * @return array<string, string>
+     */
     private static function sharedReplacements(array $vars): array
     {
         $date = $vars['date'] ?? null;

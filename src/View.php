@@ -12,19 +12,24 @@ use RuntimeException;
  */
 final class View
 {
-    /** Values made available to every template, e.g. locale and theme. */
+    /**
+     * Values made available to every template, e.g. locale and theme.
+     *
+     * @var array<string, mixed>
+     */
     private array $shared = [];
 
     public function __construct(
         private readonly string $directory = APP_ROOT . '/templates',
-    ) {
-    }
+    ) {}
 
+    /** @param array<string, mixed> $values */
     public function share(array $values): void
     {
         $this->shared = $values + $this->shared;
     }
 
+    /** @param array<string, mixed> $vars */
     public function render(string $template, array $vars = []): string
     {
         $file = $this->directory . '/' . $template . '.php';
@@ -43,7 +48,11 @@ final class View
         return (string) ob_get_clean();
     }
 
-    /** Render a template and wrap it in a layout as $content. */
+    /**
+     * Render a template and wrap it in a layout as $content.
+     *
+     * @param array<string, mixed> $vars
+     */
     public function page(string $template, array $vars = [], string $layout = 'layout'): string
     {
         $content = $this->render($template, $vars);
@@ -51,6 +60,7 @@ final class View
         return $this->render($layout, $vars + ['content' => $content]);
     }
 
+    /** @param array<string, mixed> $vars */
     public function output(string $template, array $vars = [], string $layout = 'layout'): void
     {
         echo $this->page($template, $vars, $layout);

@@ -93,6 +93,33 @@ already?" answerable no matter who taught it. Rotate a link with
 `token:rotate` if it was shared by mistake; the old one stops working
 immediately.
 
+Set `base_url` in `config/config.php` when the application sits behind a
+reverse proxy, so the links shown in the admin area and printed by the CLI
+carry the address visitors actually use.
+
+### Students practising on their own
+
+A student can be given an access link of their own (admin area → Students →
+the student → *Own access link*). With it they pick and count sentences
+themselves. That is counted as **self-practice**, in separate tables: the lesson
+counters, "least used" and every lesson statistic stay exactly what they were.
+Coaches see a student's self-practice next to the lesson figure and in the
+statistics.
+
+## Accounts and roles
+
+There are two kinds of sign-in account (admin area → *Accounts*):
+
+- **Administrator** — sees and manages everything.
+- **Coach** — tied to one coach and limited to it: that coach's profile and
+  Discord template, their students, counters, statistics and export. A coach
+  account cannot see other coaches or their students, cannot share a student
+  with another coach, and cannot import, manage collections or reach setup.
+
+Every restriction is enforced on the server for each request and each id it
+receives; the navigation merely hides what an account cannot use.
+Deactivating a coach ends their access link and their sign-in together.
+
 ## Moving to your own server
 
 A coach can take their data with them. **Export my data** on the frontend, or
@@ -143,11 +170,32 @@ used with credit to its authors.
 
 ## Development
 
+The application needs neither Composer nor Node.js to run. Both are used for
+development tooling only:
+
+```bash
+composer install     # PHPStan and PHP-CS-Fixer into vendor/
+npm install          # Prettier into node_modules/, and enables the git hooks
+```
+
+`npm install` sets `core.hooksPath` to `.githooks/`, whose pre-commit hook scans
+staged changes with [gitleaks](https://github.com/gitleaks/gitleaks) and refuses
+the commit if anything looks like a secret. Install gitleaks itself separately
+(`winget install Gitleaks.Gitleaks`, `brew install gitleaks`, …); without it
+the hook refuses rather than letting unscanned changes through.
+
 ```bash
 php -S 127.0.0.1:8000 -t public   # development server
-php bin/check_translations.php    # verify de/en/fr stay in sync
-php bin/check_contrast.php        # verify every theme meets WCAG AA
+composer check                    # everything CI runs for PHP
+composer cs:fix                   # apply the coding style
+npm run format                    # apply Prettier to CSS and JS
 ```
+
+`composer check` runs, in order: a syntax check of every file
+(`bin/lint.php`), PHPStan at level 6, PHP-CS-Fixer (PER Coding Style 2.0) in
+dry-run mode, the translation check and the contrast check. CI runs the same on
+every pull request, plus the syntax check under PHP 8.2, Prettier, and a
+gitleaks scan of the whole history.
 
 UI strings live in `lang/<locale>/frontend.php` and `lang/<locale>/admin.php`.
 English is the reference locale; `check_translations.php` reports keys that are
@@ -182,6 +230,8 @@ translations.
   Clipboard access in browsers also requires a secure context.
 - `config/config.php` holds the database credentials and the setup token. It is
   gitignored and lives outside the document root.
+- Student access links are revocable at any time; a coach's link can only be
+  rotated, since without one the coach could not reach the frontend at all.
 
 ## License
 

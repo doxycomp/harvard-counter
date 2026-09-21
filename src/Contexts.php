@@ -16,24 +16,38 @@ final class Contexts
     public const COACH = 'coach';
     public const STUDENT = 'student';
 
+    /** @return array<string, mixed>|null */
     public static function findCoachByToken(string $token): ?array
+    {
+        $context = self::findByToken($token);
+
+        return $context !== null && $context['kind'] === self::COACH ? $context : null;
+    }
+
+    /**
+     * The active coach or student an access link belongs to.
+     *
+     * @return array<string, mixed>|null
+     */
+    public static function findByToken(string $token): ?array
     {
         if (!Token::looksValid($token)) {
             return null;
         }
 
         return Db::fetchOne(
-            'SELECT * FROM contexts
-             WHERE access_token = ? AND kind = ? AND is_active = 1',
-            [$token, self::COACH],
+            'SELECT * FROM contexts WHERE access_token = ? AND is_active = 1',
+            [$token],
         );
     }
 
+    /** @return array<string, mixed>|null */
     public static function find(int $id): ?array
     {
         return Db::fetchOne('SELECT * FROM contexts WHERE id = ?', [$id]);
     }
 
+    /** @return array<string, mixed>|null */
     public static function findByName(string $name, string $kind): ?array
     {
         return Db::fetchOne(
@@ -42,7 +56,7 @@ final class Contexts
         );
     }
 
-    /** @return array<int, array> the coaches, ordered for display */
+    /** @return list<array<string, mixed>> the coaches, ordered for display */
     public static function coaches(bool $activeOnly = true): array
     {
         return Db::fetchAll(
@@ -56,6 +70,8 @@ final class Contexts
     /**
      * The students assigned to a coach and active in that assignment, using
      * the display name of the link when one is set.
+     *
+     * @return list<array<string, mixed>>
      */
     public static function studentsOf(int $coachId): array
     {
@@ -74,6 +90,7 @@ final class Contexts
      * students. The coach row is what counts a session that is not attributed
      * to a named student.
      *
+     * @param array<string, mixed> $coach
      * @return array<int, array{id:int, label:string, kind:string}>
      */
     public static function selectableFor(array $coach): array
@@ -95,7 +112,11 @@ final class Contexts
         return $options;
     }
 
-    /** Ids the coach's roll-up sums over: their own row plus their students. */
+    /**
+     * Ids the coach's roll-up sums over: their own row plus their students.
+     *
+     * @return list<int>
+     */
     public static function rollupIds(int $coachId): array
     {
         $ids = [$coachId];
@@ -106,7 +127,11 @@ final class Contexts
         return $ids;
     }
 
-    /** Guard for anything arriving from a request. */
+    /**
+     * Guard for anything arriving from a request.
+     *
+     * @param array<string, mixed> $coach
+     */
     public static function isSelectable(array $coach, int $contextId): bool
     {
         foreach (self::selectableFor($coach) as $option) {
@@ -151,6 +176,8 @@ final class Contexts
     /**
      * Update a context row from a whitelist of columns, so a request can never
      * reach a column it has no business touching (access_token above all).
+     *
+     * @param array<string, mixed> $fields
      */
     public static function update(int $id, array $fields): void
     {
@@ -166,7 +193,7 @@ final class Contexts
         }
 
         $assignments = implode(', ', array_map(
-            static fn (string $column): string => "{$column} = ?",
+            static fn(string $column): string => "{$column} = ?",
             array_keys($set),
         ));
 
@@ -176,7 +203,7 @@ final class Contexts
         );
     }
 
-    /** @return array<int, array> students with their coach assignments */
+    /** @return list<array<string, mixed>> students with their coach assignments */
     public static function students(bool $activeOnly = false): array
     {
         return Db::fetchAll(
@@ -187,7 +214,25 @@ final class Contexts
         );
     }
 
-    /** @return array<int, array> the coaches a student is assigned to */
+    /**
+     * Every student assigned to a coach, including inactive ones and inactive
+     * assignments — the management view, unlike studentsOf() which feeds the
+     * dropdown.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public static function studentsLinkedTo(int $coachId): array
+    {
+        return Db::fetchAll(
+            'SELECT c.* FROM contexts c
+             JOIN context_links l ON l.student_id = c.id
+             WHERE l.coach_id = ? AND c.kind = ?
+             ORDER BY c.name',
+            [$coachId, self::STUDENT],
+        );
+    }
+
+    /** @return list<array<string, mixed>> the coaches a student is assigned to */
     public static function coachesOf(int $studentId): array
     {
         return Db::fetchAll(
@@ -205,6 +250,15 @@ final class Contexts
         Db::query(
             'DELETE FROM context_links WHERE coach_id = ? AND student_id = ?',
             [$coachId, $studentId],
+        );
+    }
+
+    /** Rename a student under one coach only; null falls back to their own name. */
+    public static function setDisplayName(int $coachId, int $studentId, ?string $displayName): void
+    {
+        Db::query(
+            'UPDATE context_links SET display_name = ? WHERE coach_id = ? AND student_id = ?',
+            [$displayName, $coachId, $studentId],
         );
     }
 
@@ -264,15 +318,37 @@ final class Contexts
         );
     }
 
-    public static function rotateToken(int $coachId): string
+    /** Issue a new link for a coach or student; any previous one stops working. */
+    public static function rotateToken(int $contextId): string
     {
         $token = self::freshToken();
         Db::query(
-            'UPDATE contexts SET access_token = ?, updated_at = NOW() WHERE id = ? AND kind = ?',
-            [$token, $coachId, self::COACH],
+            'UPDATE contexts SET access_token = ?, updated_at = NOW() WHERE id = ?',
+            [$token, $contextId],
         );
 
         return $token;
+    }
+
+    /**
+     * Take a student's link away. Coaches always keep one — without it they
+     * could not reach the frontend at all — so they are rotated instead.
+     */
+    public static function revokeToken(int $studentId): void
+    {
+        Db::query(
+            'UPDATE contexts SET access_token = NULL, updated_at = NOW() WHERE id = ? AND kind = ?',
+            [$studentId, self::STUDENT],
+        );
+    }
+
+    /** Whether a student is assigned to this coach at all. */
+    public static function isLinked(int $coachId, int $studentId): bool
+    {
+        return Db::fetchValue(
+            'SELECT 1 FROM context_links WHERE coach_id = ? AND student_id = ?',
+            [$coachId, $studentId],
+        ) !== null;
     }
 
     /** A token that is not already in use. */

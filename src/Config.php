@@ -14,6 +14,7 @@ use RuntimeException;
  */
 final class Config
 {
+    /** @var array<string, mixed>|null */
     private static ?array $values = null;
     private static bool $loaded = false;
 

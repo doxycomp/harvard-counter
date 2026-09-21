@@ -13,7 +13,10 @@ namespace App;
  */
 final class Theme
 {
-    public const THEMES = ['default', 'pride', 'pastel', 'mono', 'trans'];
+    /** Flag themes grouped together, then the purely aesthetic ones. */
+    public const THEMES = [
+        'default', 'pride', 'trans', 'nonbinary', 'sapphic', 'ace', 'pastel', 'mono',
+    ];
     public const MODES = ['system', 'light', 'dark'];
 
     public const DEFAULT_THEME = 'default';

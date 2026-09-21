@@ -6,6 +6,7 @@ use App\Csrf;
 
 /**
  * @var array      $coaches
+ * @var bool       $isAdmin
  * @var array|null $preview
  * @var string     $importError
  * @var array      $messages
@@ -55,6 +56,7 @@ use App\Csrf;
     <?php endif; ?>
 </section>
 
+<?php if ($isAdmin): ?>
 <section class="card">
     <h2 style="margin-top:0"><?= e(t('data.import')) ?></h2>
     <p class="small muted"><?= e(t('data.import.intro')) ?></p>
@@ -146,3 +148,4 @@ use App\Csrf;
         </form>
     <?php endif; ?>
 </section>
+<?php endif; ?>

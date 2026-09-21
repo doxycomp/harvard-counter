@@ -24,7 +24,9 @@ final class I18n
 
     private static string $locale = 'en';
     private static string $fallback = 'en';
+    /** @var array<string, string> */
     private static array $strings = [];
+    /** @var array<string, true> */
     private static array $missing = [];
 
     /**
@@ -80,6 +82,7 @@ final class I18n
         return self::isSupported($default) ? $default : self::$fallback;
     }
 
+    /** @param array<string, scalar|null> $vars */
     public static function t(string $key, array $vars = []): string
     {
         $string = self::$strings[$key] ?? null;
@@ -93,6 +96,7 @@ final class I18n
         return self::interpolate($string, $vars);
     }
 
+    /** @param array<string, scalar|null> $vars */
     public static function tn(string $key, int $count, array $vars = []): string
     {
         $suffix = self::isPluralOne($count) ? 'one' : 'other';
@@ -101,7 +105,11 @@ final class I18n
         return self::t("{$key}.{$suffix}", $vars);
     }
 
-    /** Keys requested during this request that had no translation. */
+    /**
+     * Keys requested during this request that had no translation.
+     *
+     * @return list<string>
+     */
     public static function missingKeys(): array
     {
         return array_keys(self::$missing);
@@ -147,6 +155,7 @@ final class I18n
         return self::$locale === 'fr' ? abs($count) <= 1 : abs($count) === 1;
     }
 
+    /** @param array<string, scalar|null> $vars */
     private static function interpolate(string $string, array $vars): string
     {
         if ($vars === []) {
@@ -161,6 +170,7 @@ final class I18n
         return strtr($string, $replacements);
     }
 
+    /** @return array<string, string> */
     private static function loadFile(string $locale, string $domain): array
     {
         $file = APP_ROOT . "/lang/{$locale}/{$domain}.php";
@@ -187,7 +197,7 @@ final class I18n
             $candidates[] = ['tag' => explode('-', $tag)[0], 'q' => $quality];
         }
 
-        usort($candidates, static fn (array $a, array $b): int => $b['q'] <=> $a['q']);
+        usort($candidates, static fn(array $a, array $b): int => $b['q'] <=> $a['q']);
 
         return array_column($candidates, 'tag');
     }

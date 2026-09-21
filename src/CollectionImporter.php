@@ -17,8 +17,7 @@ final class CollectionImporter
 {
     public function __construct(
         private readonly string $directory = APP_ROOT . '/data/collections',
-    ) {
-    }
+    ) {}
 
     /** @return string[] absolute paths of the collection directories on disk */
     public function discover(): array
@@ -70,6 +69,7 @@ final class CollectionImporter
         });
     }
 
+    /** @return array<string, mixed> */
     private function readMeta(string $path): array
     {
         $file = $path . '/meta.json';
@@ -116,7 +116,8 @@ final class CollectionImporter
             if ($lineNumber === 1 && ($row[0] ?? '') === 'item_no') {
                 continue;
             }
-            if ($row === [null] || $row === []) {
+            // fgetcsv() returns [null] for an empty line.
+            if ($row === [null]) {
                 continue;
             }
 
@@ -151,7 +152,10 @@ final class CollectionImporter
         return $items;
     }
 
-    /** @param array<int, string[]> $items */
+    /**
+     * @param array<int, string[]> $items
+     * @param array<string, mixed> $meta
+     */
     private function validate(array $meta, array $items): void
     {
         if ($items === []) {
@@ -199,6 +203,7 @@ final class CollectionImporter
         }
     }
 
+    /** @param array<string, mixed> $meta */
     private function upsertCollection(array $meta, int $itemCount): int
     {
         $existing = Db::fetchValue('SELECT id FROM collections WHERE slug = ?', [$meta['slug']]);
@@ -219,7 +224,7 @@ final class CollectionImporter
         // time, so the statement and its parameters cannot drift apart.
         if ($existing !== null) {
             $assignments = implode(', ', array_map(
-                static fn (string $column): string => "{$column} = ?",
+                static fn(string $column): string => "{$column} = ?",
                 array_keys($values),
             ));
 

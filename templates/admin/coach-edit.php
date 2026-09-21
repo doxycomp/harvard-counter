@@ -20,12 +20,15 @@ use App\Theme;
  * @var bool   $markdownWarning
  * @var int    $studentCount
  * @var bool   $canDelete
+ * @var bool   $isAdmin
  * @var array  $messages
  */
 $id = (int) $coach['id'];
-$accessLink = '/?t=' . (string) $coach['access_token'];
+$accessLink = App\Web::accessLink((string) $coach['access_token']);
 ?>
-<p class="small"><a href="coaches.php">&larr; <?= e(t('admin.nav.coaches')) ?></a></p>
+<?php if ($isAdmin): ?>
+    <p class="small"><a href="coaches.php">&larr; <?= e(t('admin.nav.coaches')) ?></a></p>
+<?php endif; ?>
 
 <h1><?= e((string) $coach['name']) ?></h1>
 
@@ -125,14 +128,16 @@ $accessLink = '/?t=' . (string) $coach['access_token'];
             </div>
         </div>
 
-        <div class="field">
-            <label class="checkbox">
-                <input type="checkbox" name="is_active" value="1"
-                    <?= (int) $coach['is_active'] === 1 ? 'checked' : '' ?>>
-                <?= e(t('coach.active')) ?>
-            </label>
-            <p class="field__hint"><?= e(t('coach.active.hint')) ?></p>
-        </div>
+        <?php if ($isAdmin): ?>
+            <div class="field">
+                <label class="checkbox">
+                    <input type="checkbox" name="is_active" value="1"
+                        <?= (int) $coach['is_active'] === 1 ? 'checked' : '' ?>>
+                    <?= e(t('coach.active')) ?>
+                </label>
+                <p class="field__hint"><?= e(t('coach.active.hint')) ?></p>
+            </div>
+        <?php endif; ?>
     </section>
 
     <section class="card">
@@ -217,6 +222,7 @@ $accessLink = '/?t=' . (string) $coach['access_token'];
     </form>
 </section>
 
+<?php if ($isAdmin): ?>
 <section class="card">
     <h2 style="margin-top:0"><?= e(t('coach.section.danger')) ?></h2>
 
@@ -239,3 +245,4 @@ $accessLink = '/?t=' . (string) $coach['access_token'];
         </p>
     <?php endif; ?>
 </section>
+<?php endif; ?>

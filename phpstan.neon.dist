@@ -1,0 +1,18 @@
+# Static analysis. Runs in CI and with `composer analyse`.
+#
+# Templates are excluded: they receive their variables from View::render()
+# through extract(), which PHPStan cannot follow, so every template variable
+# would be reported as undefined.
+
+parameters:
+    level: 6
+    paths:
+        - src
+        - public
+        - bin
+    excludePaths:
+        - templates
+    bootstrapFiles:
+        # Defines APP_ROOT and the e()/t()/tn() helpers used everywhere.
+        - src/bootstrap.php
+    treatPhpDocTypesAsCertain: false

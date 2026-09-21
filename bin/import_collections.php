@@ -27,7 +27,7 @@ if (!Config::exists()) {
 }
 
 $importer = new CollectionImporter();
-$dryRun = in_array('--dry-run', $argv, true);
+$dryRun = in_array('--dry-run', $_SERVER['argv'], true);
 
 try {
     $paths = $importer->discover();

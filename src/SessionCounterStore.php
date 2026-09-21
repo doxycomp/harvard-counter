@@ -36,7 +36,12 @@ final class SessionCounterStore implements CounterStore
         return $counts;
     }
 
-    public function increment(int $itemId): ?string
+    public function allTotals(array $itemIds): array
+    {
+        return $this->allUses($itemIds);
+    }
+
+    public function increment(int $itemId): string
     {
         $counts = Session::get(self::KEY, []);
         $counts[$itemId] = ($counts[$itemId] ?? 0) + 1;

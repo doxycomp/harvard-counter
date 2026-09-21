@@ -32,7 +32,7 @@ $migrator = new Migrator();
 try {
     $pending = $migrator->pending();
 
-    if (in_array('--status', $argv, true)) {
+    if (in_array('--status', $_SERVER['argv'], true)) {
         $applied = $migrator->applied();
         printf("Applied:  %s\n", $applied === [] ? '(none)' : implode(', ', $applied));
         printf("Pending:  %s\n", $pending === [] ? '(none)' : implode(', ', $pending));

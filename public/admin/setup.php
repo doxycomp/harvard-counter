@@ -53,7 +53,8 @@ $unlocked = (bool) Session::get('_setup_unlocked', false);
 
 // Once an administrator exists, only a signed-in administrator may continue.
 if (!$setupOpen) {
-    $unlocked = Auth::check();
+    // Coach accounts never reach setup; only an administrator does.
+    $unlocked = Auth::isAdmin();
     if (!$unlocked) {
         http_response_code(403);
         echo $view->page('error', [

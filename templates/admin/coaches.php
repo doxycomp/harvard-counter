@@ -73,7 +73,7 @@ use App\I18n;
                     </td>
                     <td data-label="<?= e(t('coach.students')) ?>"><?= (int) $coach['student_count'] ?></td>
                     <td data-label="<?= e(t('coach.link')) ?>">
-                        <?php $link = '/?t=' . (string) $coach['access_token']; ?>
+                        <?php $link = App\Web::accessLink((string) $coach['access_token']); ?>
                         <button type="button" class="button--quiet token-button"
                                 data-copy="self" data-copy-text="<?= e($link) ?>"
                                 data-copied-label="<?= e(t('result.copied')) ?>">

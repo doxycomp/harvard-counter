@@ -4,10 +4,11 @@
 declare(strict_types=1);
 
 /**
- * Manage coaches and students from the command line.
+ * Manage coaches and students from the command line — handy for setting a
+ * server up in one go. The admin area offers the same through its interface.
  *
- * The admin area grows its own interface for this in a later milestone; until
- * then this is how a coach and their access link come into existence.
+ * Links are printed in full when config 'base_url' is set; there is no request
+ * to derive a host from here.
  *
  * Usage:
  *   php bin/contexts.php list
@@ -31,12 +32,19 @@ use App\Db;
 use App\I18n;
 use App\Theme;
 
+/** Full link when base_url is configured; a relative one otherwise. */
+$link = static function (string $token): string {
+    $base = trim((string) Config::get('base_url', ''));
+
+    return ($base === '' ? '/' : rtrim($base, '/') . '/') . '?t=' . $token;
+};
+
 if (!Config::exists()) {
     fwrite(STDERR, "config/config.php is missing.\n");
     exit(1);
 }
 
-$args = array_slice($argv, 1);
+$args = array_slice($_SERVER['argv'], 1);
 $command = array_shift($args) ?? 'list';
 
 $options = [];
@@ -107,7 +115,7 @@ try {
 
             $coach = Contexts::find($id);
             printf("Created coach \"%s\".\n", $name);
-            printf("Access link: /?t=%s\n", $coach['access_token']);
+            printf("Access link: %s\n", $link((string) $coach['access_token']));
             break;
 
         case 'student:add':
@@ -148,13 +156,13 @@ try {
 
         case 'token:show':
             $coach = $requireCoach($positional[0] ?? $fail('Usage: token:show "<coach>"'));
-            printf("/?t=%s\n", $coach['access_token']);
+            printf("%s\n", $link((string) $coach['access_token']));
             break;
 
         case 'token:rotate':
             $coach = $requireCoach($positional[0] ?? $fail('Usage: token:rotate "<coach>"'));
             $token = Contexts::rotateToken((int) $coach['id']);
-            printf("New link: /?t=%s\n", $token);
+            printf("New link: %s\n", $link($token));
             printf("The previous link no longer works.\n");
             break;
 

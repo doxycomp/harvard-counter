@@ -30,11 +30,20 @@ interface CounterStore
     public function allUses(array $itemIds): array;
 
     /**
+     * Like allUses(), but rolled up the way total() is: the coach's own row
+     * plus every assigned student. Equal to allUses() in demo mode.
+     *
+     * @param int[] $itemIds
+     * @return array<int, int> item id => uses
+     */
+    public function allTotals(array $itemIds): array;
+
+    /**
      * Record one use.
      *
-     * @return string|null a handle for undo(), or null when nothing was stored
+     * @return string a handle for undo()
      */
-    public function increment(int $itemId): ?string;
+    public function increment(int $itemId): string;
 
     /** Reverse an increment. Returns false when the handle is unknown or spent. */
     public function undo(string $handle): bool;

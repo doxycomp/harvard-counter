@@ -17,7 +17,7 @@ final class Web
 
     /**
      * @param string[] $domains translation files to load
-     * @return array{locale:string, theme:string, mode:string, basePath:string, carry:array}
+     * @return array{locale:string, theme:string, mode:string, basePath:string, carry:array<string, scalar>}
      */
     public static function boot(array $domains = ['frontend'], string $basePath = ''): array
     {
@@ -58,6 +58,10 @@ final class Web
     /**
      * Re-apply a coach's stored preferences when the visitor has not chosen
      * any of their own. Called once the access token has been resolved.
+     *
+     * @param array<string, mixed> $vars
+     * @param list<string> $domains
+     * @return array<string, mixed>
      */
     public static function applyContextPreferences(
         array $vars,
@@ -94,6 +98,40 @@ final class Web
         );
     }
 
+    /**
+     * Absolute URL of the public document root, with a trailing slash — the
+     * part a coach's link is built on.
+     *
+     * config 'base_url' wins when set, since behind a reverse proxy the host
+     * and scheme PHP sees are not necessarily the ones visitors use. Otherwise
+     * it is derived from the current request, which is right for a plain setup.
+     */
+    public static function baseUrl(): string
+    {
+        $configured = trim((string) Config::get('base_url', ''));
+        if ($configured !== '') {
+            return rtrim($configured, '/') . '/';
+        }
+
+        $https = (string) ($_SERVER['HTTPS'] ?? '') !== '' && strtolower((string) $_SERVER['HTTPS']) !== 'off';
+        $host = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
+
+        // Admin pages live one level below the document root.
+        $directory = str_replace('\\', '/', dirname((string) ($_SERVER['SCRIPT_NAME'] ?? '/')));
+        if (basename($directory) === 'admin') {
+            $directory = str_replace('\\', '/', dirname($directory));
+        }
+        $directory = rtrim($directory, '/');
+
+        return ($https ? 'https' : 'http') . '://' . $host . $directory . '/';
+    }
+
+    /** The full access link for a coach token. */
+    public static function accessLink(string $token): string
+    {
+        return self::baseUrl() . '?t=' . rawurlencode($token);
+    }
+
     public static function redirect(string $location, int $status = 303): never
     {
         header('Location: ' . $location, true, $status);
@@ -110,7 +148,11 @@ final class Web
         return (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
     }
 
-    /** A GET/POST parameter as a trimmed string, or null when absent or empty. */
+    /**
+     * A GET/POST parameter as a trimmed string, or null when absent or empty.
+     *
+     * @param array<string, mixed>|null $source
+     */
     public static function stringParam(string $name, ?array $source = null): ?string
     {
         $source ??= $_GET;
@@ -149,13 +191,17 @@ final class Web
         return $changed;
     }
 
-    /** Query parameters other than the appearance ones, for the switcher form. */
+    /**
+     * Query parameters other than the appearance ones, for the switcher form.
+     *
+     * @return array<string, scalar>
+     */
     private static function carriedParams(): array
     {
         $carry = $_GET;
         unset($carry['lang'], $carry['theme'], $carry['mode']);
 
-        return array_filter($carry, static fn ($value): bool => is_scalar($value));
+        return array_filter($carry, static fn($value): bool => is_scalar($value));
     }
 
     private static function redirectWithoutAppearanceParams(): never

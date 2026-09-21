@@ -13,6 +13,7 @@ declare(strict_types=1);
 require dirname(__DIR__, 2) . '/src/bootstrap.php';
 
 use App\AdminPage;
+use App\Auth;
 use App\Collections;
 use App\Contexts;
 use App\Stats;
@@ -22,12 +23,15 @@ use App\Stats;
 $coaches = Contexts::coaches(false);
 $collections = Collections::active();
 
-$coachId = AdminPage::id('coach') ?? (isset($coaches[0]) ? (int) $coaches[0]['id'] : null);
+// "All coaches" is the default and the first option; a coach id narrows it.
+// A coach account is always narrowed to itself, whatever the request says.
+$coachId = AdminPage::coachScope() ?? AdminPage::id('coach');
 $coach = $coachId === null ? null : Contexts::find($coachId);
 
 if ($coach !== null && $coach['kind'] !== Contexts::COACH) {
     $coach = null;
 }
+$scopeId = $coach === null ? null : (int) $coach['id'];
 
 $collectionId = AdminPage::id('c');
 $collection = $collectionId === null
@@ -36,15 +40,16 @@ $collection = $collectionId === null
 
 $data = null;
 
-if ($coach !== null && $collection !== null) {
-    $counts = Stats::itemCounts((int) $coach['id'], (int) $collection['id']);
-    $monthly = Stats::monthly((int) $coach['id']);
+if ($coaches !== [] && $collection !== null) {
+    $counts = Stats::itemCounts($scopeId, (int) $collection['id']);
+    $monthly = Stats::monthly($scopeId);
 
     $data = [
-        'summary' => Stats::summaryForCoach((int) $coach['id']),
+        'summary' => Stats::summaryForCoach($scopeId),
         'monthly' => $monthly,
         'monthlyPeak' => $monthly === [] ? 0 : max($monthly),
-        'byStudent' => Stats::byStudent((int) $coach['id']),
+        'byStudent' => Stats::byStudent($scopeId),
+        'selfPractice' => Stats::selfPractice($scopeId),
         'top' => Stats::extremes($counts, 10, false),
         'bottom' => Stats::extremes($counts, 10, true),
         'itemLabel' => Collections::itemLabel($collection, $vars['locale']),
@@ -55,6 +60,7 @@ echo $view->page('admin/stats', [
     'title' => t('admin.nav.stats'),
     'messages' => AdminPage::takeFlash(),
     'coaches' => $coaches,
+    'isAdmin' => Auth::isAdmin(),
     'collections' => $collections,
     'coach' => $coach,
     'collection' => $collection,

@@ -1,0 +1,14 @@
+{
+  "name": "harvard-counter",
+  "private": true,
+  "description": "Development tooling only. The application itself needs no Node.js and no build step.",
+  "license": "MIT",
+  "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
+    "format": "prettier --write \"public/assets/**/*.{css,js}\"",
+    "format:check": "prettier --check \"public/assets/**/*.{css,js}\""
+  },
+  "devDependencies": {
+    "prettier": "3.9.8"
+  }
+}

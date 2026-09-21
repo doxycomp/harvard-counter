@@ -78,9 +78,7 @@
     }
 
     var warning = document.querySelector("[data-preview-warning]");
-    var fields = Array.prototype.slice.call(
-      document.querySelectorAll("[data-preview-field]")
-    );
+    var fields = Array.prototype.slice.call(document.querySelectorAll("[data-preview-field]"));
 
     function value(id) {
       var element = document.getElementById(id);
@@ -109,7 +107,7 @@
         "{date}": vars.date || "",
         "{n}": "",
         "{global_no}": "",
-        "{sentence}": ""
+        "{sentence}": "",
       };
     }
 
@@ -157,19 +155,22 @@
     }
 
     var source = trigger.getAttribute("data-copy");
-    var text = source === "self"
-      ? (trigger.getAttribute("data-copy-text") || trigger.textContent.trim())
-      : (document.getElementById(source) || {}).textContent;
+    var text =
+      source === "self"
+        ? trigger.getAttribute("data-copy-text") || trigger.textContent.trim()
+        : (document.getElementById(source) || {}).textContent;
 
     if (!text) {
       return;
     }
 
     event.preventDefault();
-    copyText(text).then(function () {
-      flash(trigger);
-    }).catch(function () {
-      /* Leave the text on screen so it can still be selected by hand. */
-    });
+    copyText(text)
+      .then(function () {
+        flash(trigger);
+      })
+      .catch(function () {
+        /* Leave the text on screen so it can still be selected by hand. */
+      });
   });
 })();

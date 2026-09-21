@@ -14,6 +14,7 @@ declare(strict_types=1);
 require dirname(__DIR__, 2) . '/src/bootstrap.php';
 
 use App\AdminPage;
+use App\Auth;
 use App\Collections;
 use App\Contexts;
 use App\Csrf;
@@ -48,7 +49,7 @@ $sampleFor = static function (?int $collectionId) use ($collections): array {
 };
 
 /** Read the template out of a posted form. */
-$templateFromPost = static fn (): array => [
+$templateFromPost = static fn(): array => [
     'header' => Str::truncate((string) ($_POST['fmt_header'] ?? ''), 500, ''),
     'line' => Str::truncate((string) ($_POST['fmt_line'] ?? ''), 500, ''),
     'footer' => Str::truncate((string) ($_POST['fmt_footer'] ?? ''), 500, ''),
@@ -57,6 +58,15 @@ $templateFromPost = static fn (): array => [
 ];
 
 $editing = AdminPage::id('id');
+$isAdmin = Auth::isAdmin();
+
+// A coach account has exactly one coach to look at: its own.
+if (!$isAdmin) {
+    $editing ??= AdminPage::coachScope();
+    if ($editing === null || !AdminPage::mayAccessCoach($editing)) {
+        AdminPage::deny($view);
+    }
+}
 $formTemplate = null;
 $formError = '';
 
@@ -64,6 +74,15 @@ if (Web::isPost()) {
     Csrf::verify();
     $action = Web::stringParam('action', $_POST);
     $id = AdminPage::id('id', $_POST);
+
+    // Creating and deleting coaches is an administrator's job; everything
+    // else needs the coach to be one this account may touch.
+    if (in_array($action, ['create', 'delete'], true) && !$isAdmin) {
+        AdminPage::deny($view);
+    }
+    if ($id !== null && !AdminPage::mayAccessCoach($id)) {
+        AdminPage::deny($view);
+    }
 
     if ($action === 'create') {
         $name = trim((string) ($_POST['name'] ?? ''));
@@ -110,7 +129,9 @@ if (Web::isPost()) {
 
             Contexts::update($id, [
                 'name' => Str::truncate($name, 120, ''),
-                'is_active' => isset($_POST['is_active']) ? 1 : 0,
+                // A coach cannot switch themselves off — that would end their
+                // own link and sign-in in one click.
+                'is_active' => $isAdmin ? (isset($_POST['is_active']) ? 1 : 0) : (int) $coach['is_active'],
                 'locale' => $locale !== null && I18n::isSupported($locale) ? $locale : null,
                 'theme' => Theme::isTheme($theme) ? $theme : null,
                 'color_mode' => Theme::isMode($mode) && $mode !== 'system' ? $mode : null,
@@ -190,10 +211,11 @@ if ($editing !== null) {
         'collections' => $collections,
         'preview' => Formatter::render($template, $previewVars, $sample['lines']),
         'previewVars' => $previewVars,
-        'previewLines' => array_map(static fn (array $l): string => (string) $l['text'], $sample['lines']),
+        'previewLines' => array_map(static fn(array $l): string => (string) $l['text'], $sample['lines']),
         'markdownWarning' => Formatter::markdownInCodeblock($template),
         'studentCount' => Contexts::studentCount((int) $coach['id']),
-        'canDelete' => Contexts::isUnused((int) $coach['id']),
+        'canDelete' => $isAdmin && Contexts::isUnused((int) $coach['id']),
+        'isAdmin' => $isAdmin,
     ]);
     exit;
 }

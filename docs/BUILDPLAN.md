@@ -43,6 +43,9 @@ collection-aware from day one.
 | Appearance | Light/dark/system plus selectable colour themes |
 | Export | JSON and CSV, retrievable by the coach through their own token link |
 | Licence | MIT for the code, per-collection licence and attribution in the data model |
+| Self-practice | Students may get their own link; what they count lives in separate tables so lesson figures stay clean |
+| Accounts | Two roles: administrator (everything) and coach (limited to one coach), enforced per request |
+| Tooling | PHPStan level 6, PHP-CS-Fixer (PER-CS 2.0), Prettier, gitleaks pre-commit hook, CI on every pull request |
 
 ---
 
@@ -329,8 +332,9 @@ wrong theme on load:
 
 * **Colour mode:** `system` (default, follows `prefers-color-scheme`), `light`,
   `dark`.
-* **Colour theme:** `default`, `pride`, `pastel`, `mono` (black and white),
-  `trans`.
+* **Colour theme:** `default`, the flag themes `pride`, `trans`, `nonbinary`,
+  `sapphic` and `ace`, and the purely aesthetic `pastel` and `mono` (black and
+  white).
 
 Implementation: all colours are CSS custom properties. The server reads the
 cookie and renders `<html data-theme="trans" data-mode="dark">`, so the correct
@@ -472,7 +476,46 @@ Mobile-first, single column, no CSS framework.
 
 ---
 
-## 15. Deliberately out of scope
+## 15. Added after the first release
+
+### Self-practice (migration 0002)
+
+A student can hold an access link of their own. What they count there is
+self-practice, stored in `self_counts` and `self_events` — deliberately *not* in
+`usage_counts` / `usage_events` with a source column. Separate tables mean no
+existing lesson query can pick up homework by forgetting a filter: "least
+used", the coach totals and every lesson statistic are untouched by
+construction. A student sees their self-practice figure with the lesson figure
+beside it; a coach sees a student's self-practice beside their lesson figure
+and in the statistics. Student links are revocable; coach links only rotate.
+
+### Coach accounts (migration 0002)
+
+`admin_users` gained `role` (`admin` | `coach`) and `coach_id`. A coach account
+is limited to its coach: profile and template, the students assigned to it,
+their counters, statistics and export. It cannot see other coaches or their
+students, share a student with another coach, rename or delete a student
+shared with another coach, import, manage collections or accounts, or reach
+setup. Creating a student from a coach account always creates a new person —
+matching the name against existing students would reveal other coaches'
+students.
+
+Enforcement lives in `AdminPage::mayAccessCoach()` / `mayAccessContext()` and
+runs on every id a request carries; the navigation only hides what an account
+cannot use. The role is read fresh on each request, so deactivating a coach
+ends their sign-in at once, not at the next login.
+
+### Tooling
+
+PHPStan at level 6 (templates excluded, since their variables arrive through
+`extract()`), PHP-CS-Fixer with PER Coding Style 2.0, Prettier for CSS and JS,
+and a gitleaks pre-commit hook in `.githooks/`. CI runs all of it, plus the
+syntax check under PHP 8.2 and a gitleaks scan of the full history. Composer
+and npm are development dependencies only; deployment remains a `git pull`.
+
+---
+
+## 16. Deliberately out of scope
 
 * Per-student Discord formats (students inherit from their coach).
 * A login for the frontend — the token is the access mechanism.
@@ -482,7 +525,7 @@ Mobile-first, single column, no CSS framework.
 
 ---
 
-## 16. Licence
+## 17. Licence
 
 The source code for this project is licensed under the MIT License.
 
